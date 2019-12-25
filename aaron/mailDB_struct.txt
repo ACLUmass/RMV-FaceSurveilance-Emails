@@ -1,0 +1,12 @@
+[                     #email list containing email records of the following form
+  {mailNo : integer,  #sequential from 0 thru all 10k+ emails, good for debugging
+  mailId : string,    #file_page_no - for easily locating an email in pds
+  from : string,      #exactly as it appears in pdf. There's lots a variation
+  to: string,         # "
+  date: string,       # "
+  cc : string,        # "
+  body : string},     #all remaining text in the email, preserving text order
+  .                   #another email record just like the one above
+  .
+  {}                  #last email record
+]
