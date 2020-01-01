@@ -1,0 +1,36 @@
+#json structure of email database
+[                     #email list containing email records of the following form
+  {mailNo : integer,  #sequential from 0 thru all 10k+ emails, good for debugging
+  mailId : string,    #file_page_no - for easily locating an email in pds
+  from : string,      #exactly as it appears in pdf. There's lots a variation
+  to: string,         # "
+  date: string,       # "
+  cc : string,        # "
+  body : string},     #all remaining text in the email, preserving text order
+  .                   #another email record just like the one above
+  .
+  {}                  #last email record
+]
+
+#json structure of face recognition log database
+[                     #first row is column headings for all subsequent rows`
+  [number,    #1-n, starts over each year
+  year,       #2016-2019. I added this
+  month,
+  day,
+  officer,    #officer requesting the scan
+  agency,     #requesting agency (state police, massDOT, Boston PD, etc)
+  office,     #random stuff I can't figure out
+  location,   #state, federal, local
+  reqMethod,  #email, phone, etc
+  reqNumber,  #how many scans requested
+  reqMatch,   #how many requests were match
+  photoAry,   #photo array is the spreadsheet heading. I don't know what it means
+  other,
+  notes],
+  []          #first data row. all strings
+  .
+  .
+  []          #last data row
+]
+
