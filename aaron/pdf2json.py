@@ -79,6 +79,9 @@ def mkMailRec(mailNo,mailId,txt):
 
 #sys.argv[2] is the json file to create without the json extension
 
+mailTot = [] #all the emails in all the files for json output
+dbgInfo = [] #a tuple for each file (prefix,mailCt,pageCt)
+
 mailList = open(sys.argv[1] + '.json', 'r')
 r = mailList.read()  #read in all the bytes into one string
 pdfs = json.loads(r)
@@ -132,12 +135,17 @@ for pdf in pdfs: #go thru each pdf in the list
     mailCt += 1
     mails.append(mkMailRec(mailCt,mailId,txt[mailBeg:mailEnd]))
 
+  mailTot.extend(mails)
+  dbgInfo.append((str(srcId),mailCt,pageCt))
+
 #output results to a file
 with open(sys.argv[2] + '.json', 'w') as f:
-    json.dump(mails, f)
+    #json.dump(mails, f)
+    json.dump(mailTot, f)
 
 #output stuff to stdout just for debugging
-for mail in mails:
+#for mail in mails:
+for mail in mailTot:
   print('=============')
   print(mail)
   #for key in ['mailNo','mailId','from','to','date','cc','subject','body']:
@@ -145,7 +153,8 @@ for mail in mails:
 print('0^^^^^^^^^^^^^^^^^^^^^^')
 cols = ['mailId','from','date']
 tbl = [cols]
-for mail in mails:
+#for mail in mails:
+for mail in mailTot:
   row = []
   for key in cols:
     row.append(mail[key])
@@ -158,7 +167,8 @@ print(niceTbl)
 print('1^^^^^^^^^^^^^^^^^^^^^^')
 cols = ['mailId','to','cc']
 tbl = [cols]
-for mail in mails:
+#for mail in mails:
+for mail in mailTot:
   row = []
   for key in cols:
     row.append(mail[key])
@@ -168,10 +178,15 @@ print(niceTbl)
 
 
 print('2^^^^^^^^^^^^^^^^^^^^^^')
-for mail in mails:
+#for mail in mails:
+for mail in mailTot:
   print(mail['mailId'],'  !!!!!!!!!!!!!!')
   print(mail['body'])
 
 print('3^^^^^^^^^^^^^^^^^^^^^^')
-print('mailCt = ',mailCt,'    pageCt = ',pageCt)
+mailCtTot = 0
+for dbg in dbgInfo:
+  mailCtTot += dbg[1]
+  print('srcId = ',dbg[0],'   mailCt = ',dbg[1],'    pageCt = ',dbg[2])
 
+print('mailCtTot = ',mailCtTot)
