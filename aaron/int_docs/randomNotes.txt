@@ -1,4 +1,5 @@
 Suspicious stuff
 ================
 1) email 1_182_2 has from: redacted. What's that about?
+2) what does '(Responsive)' mean in file names. Have emails with no official response been removed?
 

@@ -2,6 +2,8 @@ import sys
 import re
 import json
 import pdfplumber
+from tabulate import tabulate
+
 
 #works with output from  pdf2txt.py msp_p1.pdf > msp_p1.txt
 fromCt = 0
@@ -45,7 +47,8 @@ def mkMailRec(mailNo,mailId,txt):
   #for key in ['from','to','date','sent','cc','subject']:
   for key in ['from','to','date','sent','cc']:
     for i in range(len(lines)):
-      chk = re.match('\s*' + key + ':',lines[i],re.IGNORECASE)
+      #chk = re.match('\s*' + key + ':',lines[i],re.IGNORECASE)
+      chk = re.match('>*\s*' + key + ':',lines[i],re.IGNORECASE)
       if chk:
         line = lines.pop(i)
         keyEnd = chk.span()[1]
@@ -84,10 +87,15 @@ for pdf in pdfs: #go thru each pdf in the list
   srcId = pdf[0]   #which rmv pdf this text came from
   txt = pdf2txt(pdf[1] + '.pdf') #convert the pdf to text
 
+  #these stats are for debugging quick checks
+  pageCt = 0 #should equal last page number in pdf
+  mailCt = 0 #should equal the number of emails in the pdf and the last mailNo
+
   #find the character location of each page break in the text string
   brklocs = []
   brks = re.finditer('\f',txt,re.IGNORECASE)
   for brk in brks:
+    pageCt += 1
     brklocs.append(brk.span()[0])
 
   #find the character location of start of each email in the text string
@@ -121,9 +129,49 @@ for pdf in pdfs: #go thru each pdf in the list
       mailEnd = maillocs[i+1][1]
     else:
       mailEnd = len(txt)
-    mails.append(mkMailRec(i,mailId,txt[mailBeg:mailEnd]))
+    mailCt += 1
+    mails.append(mkMailRec(mailCt,mailId,txt[mailBeg:mailEnd]))
 
 #output results to a file
 with open(sys.argv[2] + '.json', 'w') as f:
     json.dump(mails, f)
+
+#output stuff to stdout just for debugging
+for mail in mails:
+  print('=============')
+  print(mail)
+  #for key in ['mailNo','mailId','from','to','date','cc','subject','body']:
+
+print('0^^^^^^^^^^^^^^^^^^^^^^')
+cols = ['mailId','from','date']
+tbl = [cols]
+for mail in mails:
+  row = []
+  for key in cols:
+    row.append(mail[key])
+  tbl.append(row)
+niceTbl =  tabulate(tbl,headers='firstrow')
+print(niceTbl)
+
+
+
+print('1^^^^^^^^^^^^^^^^^^^^^^')
+cols = ['mailId','to','cc']
+tbl = [cols]
+for mail in mails:
+  row = []
+  for key in cols:
+    row.append(mail[key])
+  tbl.append(row)
+niceTbl =  tabulate(tbl,headers='firstrow')
+print(niceTbl)
+
+
+print('2^^^^^^^^^^^^^^^^^^^^^^')
+for mail in mails:
+  print(mail['mailId'],'  !!!!!!!!!!!!!!')
+  print(mail['body'])
+
+print('3^^^^^^^^^^^^^^^^^^^^^^')
+print('mailCt = ',mailCt,'    pageCt = ',pageCt)
 
