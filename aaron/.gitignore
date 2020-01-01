@@ -3,6 +3,7 @@ S generated files #
 .DS_Store
 env/*
 ext_docs/*
+src/*
 sandbox/*
 docxs/*
 *.*~
@@ -10,7 +11,6 @@ docxs/*
 *.pyc
 *.swp
 *.json
-*.txt
 
 
 
