@@ -121,7 +121,8 @@ for pdf in pdfs: #go thru each pdf in the list
     else:
       frId += 1
  
-    mailId = str(srcId) + '_' + str(brkIdx + 1) + '_' + str(frId) #adobe reader page numbering starts at 1   
+    #mailId = str(srcId) + '_' + str(brkIdx + 1) + '_' + str(frId) #adobe reader page numbering starts at 1   
+    mailId = srcId + '_' + str(brkIdx + 1) + '_' + str(frId) #adobe reader page numbering starts at 1   
     maillocs.append((mailId,frlocs[i]))
 
   #now we can create a record for each email from that single big text string
@@ -136,7 +137,8 @@ for pdf in pdfs: #go thru each pdf in the list
     mails.append(mkMailRec(mailCt,mailId,txt[mailBeg:mailEnd]))
 
   mailTot.extend(mails)
-  dbgInfo.append((str(srcId),mailCt,pageCt))
+  #dbgInfo.append((str(srcId),mailCt,pageCt))
+  dbgInfo.append((srcId,mailCt,pageCt))
 
 #output results to a file
 with open(sys.argv[2] + '.json', 'w') as f:

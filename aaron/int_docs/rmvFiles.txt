@@ -23,6 +23,6 @@ interesting    FR Emails - Search 12 attachments_Redacted.pdf
 usable         FR Emails - Search 12 Readacted.pdf
 usable         FR Emails - Search 16 Readacted.pdf
 interesting    FR Emails - Search 18 attachments_Redacted.pdf
-usable         FR Emails - Search 18 Readacted.pdf
+usable         FR Emails - Search 18 Readacted.pdf (not sure if this is scannable)
 interesting    FR Emails - Search 19 attachments_Redacted.pdf
 usable         FR Emails - Search 19 Readacted.pdf
