@@ -44,7 +44,6 @@ def mkMailRec(mailNo,mailId,txt):
   email['mailNo'] = mailNo #useful for debugger breakpoints
   email['mailId'] = mailId #useful for locating email in pdf
   lines = txt.splitlines() 
-  #for key in ['from','to','date','sent','cc','subject']:
   for key in ['from','to','date','sent','cc']:
     for i in range(len(lines)):
       #chk = re.match('\s*' + key + ':',lines[i],re.IGNORECASE)
@@ -70,9 +69,67 @@ def mkMailRec(mailNo,mailId,txt):
     email['body'] = ''.join(lines) #what's left is the body
   else:
     email['body'] =  None
-    
+
+  #98% of the emails are well formed enough to be parsed by the code above.
+  #The remaining 2% are special cases that we'll try to catch below.
+
+  #case msp3_163_4,5 and others. Multiple fields appear on same line with From:
+  if email['date'] == None:  #can't split this email into lines
+    email = mkOneLine(mailNo,mailId,txt) #TODO - not perfect. because of mailto: I'm not testing for To:
+ 
+  #msp3_242_2 and ones like it can't be fixed because somebody retyped the info without the identifying header stuff
+  #msp3 all other missing fields have been redacted or heading has been omitted
+     
   return email
 
+      
+#make an email record from the single text string of that email
+def mkOneLine(mailNo,mailId,txt):
+  email = {}
+  email['mailNo'] = mailNo #useful for debugger breakpoints
+  email['mailId'] = mailId #useful for locating email in pdf
+  hdrlocs = []
+  hdrlocs.append((re.search('^From:',txt,re.IGNORECASE).span(),'from')) #these 3 must exist or the email is malformed
+
+  email['to'] = None #these may not exist in email
+  email['cc'] = None
+  email['body'] = None
+  email['date'] = None
+  tmp = re.search('Date:|Sent:',txt,re.IGNORECASE)
+  if tmp:
+    hdrlocs.append((tmp.span(),'date'))
+  tmp = re.search('[^l]To:',txt,re.IGNORECASE)
+  if tmp:
+    hdrlocs.append((tmp.span(),'to'))
+  tmp = re.search('Cc:',txt,re.IGNORECASE)
+  if tmp:
+    hdrlocs.append((tmp.span(),'cc'))
+
+  hdrlocs = sorted(hdrlocs, key=lambda hdr: hdr[0][0]) #now we have the headers fields in the order they occur in text string
+  for i in range(len(hdrlocs)):
+    key = hdrlocs[i][1]
+    datBeg = hdrlocs[i][0][1] #text begins after the key
+    if i < len(hdrlocs) - 1: 
+      datEnd = hdrlocs[i+1][0][0] #text ends before the next key
+    else:
+      datEnd = len(txt) #all the rest of the text
+    email[key] = txt[datBeg:datEnd]
+
+  #It gets a little tricky here because the email body still has to be separated from the last header parameter
+  #I think return is always a separator but I'm not 100% sure.
+  key = hdrlocs[-1][1]  #last header
+  tmp = re.search('\n',email[key],re.IGNORECASE)
+  if tmp:
+    div = tmp.span()[1]
+    email['body'] = email[key][div:] #everything after the match
+    email[key] = email[key][0:div] #everything before the body
+
+  if re.search('.+\n.+',email['from']) != None: #TODO - check why I can't do this on every line
+    tmp1 = email['from']
+    email['from'] = tmp1.replace('\n',' ')
+
+  return email
+ 
  
 #sys.argv[1] is a json file (no json extention) of all the mail pdfs
 #[['prefix','filename'],....]
