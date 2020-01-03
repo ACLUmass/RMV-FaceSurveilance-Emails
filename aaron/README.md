@@ -7,7 +7,7 @@ Files that Aaron alone contributes to live here.
 ├── README.md
 ├── pdf2json.py           - program to convert all email pdf sources to one json object
 ├── mailList.json         - paths to all all the RMV pds in src to convert
-├── allmails.json         - output of pdf2json.py because the sources to generate it are not
+├── allMails.json         - output of pdf2json.py because the sources to generate it are not
 ├── csv2json.py           - program to convert facial recognition csv log sources to one json object
 ├── logList.json          - paths to all all the RMV csv in src to convert
 ├── allLogs.json          - output of csv2json.py because the sources to generate it are not

@@ -80,6 +80,7 @@ def mkMailRec(mailNo,mailId,txt):
  
   #msp3_242_2 and ones like it can't be fixed because somebody retyped the info without the identifying header stuff
   #msp3 all other missing fields have been redacted or heading has been omitted
+  #fr3_29_2 is screwed up by pdfplumber. It gets the page breaks in the wrong place and finditer misses a from: fr5_10_2 and fr6_146_2 have the same problem
      
   return email
 
