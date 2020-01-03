@@ -47,7 +47,11 @@ def mkMailRec(mailNo,mailId,txt):
   for key in ['from','to','date','sent','cc']:
     for i in range(len(lines)):
       #chk = re.match('\s*' + key + ':',lines[i],re.IGNORECASE)
-      chk = re.match('>*\s*' + key + ':',lines[i],re.IGNORECASE)
+      if key == 'date': 
+        chk = re.match('>*\s*' + key + ':',lines[i],re.IGNORECASE)
+        chk = re.match('>*\s*(date|sent):',lines[i],re.IGNORECASE)
+      else:
+        chk = re.match('>*\s*' + key + ':',lines[i],re.IGNORECASE)
       if chk:
         line = lines.pop(i)
         keyEnd = chk.span()[1]
@@ -61,9 +65,6 @@ def mkMailRec(mailNo,mailId,txt):
         break
     else:
       email[key] = None
-
-  if email['date'] == None:
-    email['date'] = email.pop('sent') #only one for these two will exist
 
   if len(lines) > 0:
     email['body'] = ''.join(lines) #what's left is the body
@@ -138,6 +139,7 @@ def mkOneLine(mailNo,mailId,txt):
 
 mailTot = [] #all the emails in all the files for json output
 dbgInfo = [] #a tuple for each file (prefix,mailCt,pageCt)
+mailNo = 0
 
 mailList = open(sys.argv[1] + '.json', 'r')
 r = mailList.read()  #read in all the bytes into one string
@@ -191,7 +193,9 @@ for pdf in pdfs: #go thru each pdf in the list
     else:
       mailEnd = len(txt)
     mailCt += 1
-    mails.append(mkMailRec(mailCt,mailId,txt[mailBeg:mailEnd]))
+    mailNo += 1
+    #mails.append(mkMailRec(mailCt,mailId,txt[mailBeg:mailEnd]))
+    mails.append(mkMailRec(mailNo,mailId,txt[mailBeg:mailEnd]))
 
   mailTot.extend(mails)
   #dbgInfo.append((str(srcId),mailCt,pageCt))
