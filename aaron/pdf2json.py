@@ -44,7 +44,8 @@ def mkMailRec(mailNo,mailId,txt):
   email['mailNo'] = mailNo #useful for debugger breakpoints
   email['mailId'] = mailId #useful for locating email in pdf
   lines = txt.splitlines() 
-  for key in ['from','to','date','sent','cc']:
+  #for key in ['from','to','date','sent','cc']:
+  for key in ['from','to','date','cc']:
     for i in range(len(lines)):
       #chk = re.match('\s*' + key + ':',lines[i],re.IGNORECASE)
       if key == 'date': 
