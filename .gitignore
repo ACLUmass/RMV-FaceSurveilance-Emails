@@ -1,2 +1,5 @@
 # PyCharm files (Lauren's IDE)
 .idea
+
+# IPython/Jupyter Notebook products
+*.ipynb_checkpoints*
