@@ -1,3 +1,5 @@
+#command line> python pdf2json.py mailList allMails > dbgfile
+
 import sys
 import re
 import json
@@ -140,7 +142,7 @@ def mkOneLine(mailNo,mailId,txt):
 #sys.argv[2] is the json file to create without the json extension
 
 mailTot = [] #all the emails in all the files for json output
-dbgInfo = [] #a tuple for each file (prefix,mailCt,pageCt)
+dbgInfo = [] #a tuple for each file (prefix,mailCt,pageCt,blankCt)
 mailNo = 0
 
 mailList = open(sys.argv[1] + '.json', 'r')
@@ -161,6 +163,18 @@ for pdf in pdfs: #go thru each pdf in the list
   for brk in brks:
     pageCt += 1
     brklocs.append(brk.span()[0])
+
+  #count blank pages
+  blankCt = 0
+  brkSv = None
+  for brk in brklocs:
+    if brkSv == None: #find the first page break
+      brkSv = brk
+    else: #two consecutive page breaks means there is a blank page
+      if brk == brkSv + 1:
+        blankCt += 1
+      brkSv = brk
+
 
   #find the character location of start of each email in the text string
   frlocs = []
@@ -201,7 +215,7 @@ for pdf in pdfs: #go thru each pdf in the list
 
   mailTot.extend(mails)
   #dbgInfo.append((str(srcId),mailCt,pageCt))
-  dbgInfo.append((srcId,mailCt,pageCt))
+  dbgInfo.append((srcId,mailCt,pageCt,blankCt))
 
 #output results to a file
 with open(sys.argv[2] + '.json', 'w') as f:
@@ -250,8 +264,16 @@ for mail in mailTot:
 
 print('3^^^^^^^^^^^^^^^^^^^^^^')
 mailCtTot = 0
+pageCtTot = 0
+blankCtTot = 0
 for dbg in dbgInfo:
   mailCtTot += dbg[1]
-  print('srcId = ',dbg[0],'   mailCt = ',dbg[1],'    pageCt = ',dbg[2])
+  pageCtTot += dbg[2]
+  blankCtTot += dbg[3]
+  print('srcId = ',dbg[0],'   mailCt = ',dbg[1],'   pageCt = ',dbg[2],'   blankCt = ',dbg[3])
 
-print('mailCtTot = ',mailCtTot)
+
+pageAvg = float(mailCtTot/(pageCtTot - blankCtTot)) # average number of emails in non blank pages
+mailMiss = pageAvg * blankCtTot #assume the same average for blank pages
+
+print('mailCtTot = ',mailCtTot,'   pageCtTot = ',pageCtTot,'   blankCtTot = ',blankCtTot,'   est. missed emails = ',mailMiss)
