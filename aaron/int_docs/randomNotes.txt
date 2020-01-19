@@ -1,8 +1,0 @@
-Suspicious stuff
-================
-1) email msp1_182_2 has from: redacted. What's that about?
-2) what does '(Responsive)' mean in file names. Have emails with no official response been removed?
-3) email msp3_283_3 has from: redacted. What's that about?
-4) email msp3_521_1 has from: redacted. What's that about?
-5) email msp5 page 78 has embedded photo with no attachment
-
