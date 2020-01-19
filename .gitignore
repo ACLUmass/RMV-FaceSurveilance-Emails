@@ -3,3 +3,5 @@
 
 # IPython/Jupyter Notebook products
 *.ipynb_checkpoints*
+
+.DS_Store
