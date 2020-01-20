@@ -1,12 +1,17 @@
 import sys
 import json
  
-#sys.argv[1] is a json file (no json extention) of all the log spreadsheets exported in csv form (no csv extension) as follows
+#Usage using python3
+#python csv2json.py logList.json ../data/src/allLogs.json > logsDbg.txt
+
+#sys.argv[1] is a json file of all the log spreadsheets exported in csv form as follows.
 #[['year','filename'],....]
+#filename without csv extension must be relative to pdf_processing
 
-#sys.argv[2] is the json file to create without the json extension
+#sys.argv[2] is the json file to create
+#logsDbg.txt is debugging print statements
 
-logList = open(sys.argv[1] + '.json', 'r')
+logList = open(sys.argv[1], 'r')
 r = logList.read()  #read in all the bytes into one string
 logs = json.loads(r)
 
@@ -22,6 +27,6 @@ for log in logs:
     line = lines[i].split(',')
     tbl.append([line[0]] + [year] + line[1:])
 
-with open(sys.argv[2] + '.json', 'w') as f:
+with open(sys.argv[2] , 'w') as f:
     json.dump(tbl, f)
 
