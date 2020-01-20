@@ -7,7 +7,17 @@ import pdfplumber
 from tabulate import tabulate
 
 
-#works with output from  pdf2txt.py msp_p1.pdf > msp_p1.txt
+#usage in python3 environment
+# python pdf2json.py mailList.json allMails.json >mailDbg.txt
+
+#sys.argv[1] is a json file of all the email pdfs
+#[['year','filename'],....]
+#filename without pdf extension must be relative to pdf_processing
+
+#sys.argv[2] is the json file to create without
+#mailDbg.txt is debugging print statements
+
+
 fromCt = 0
 pageCt = 0
 dateCt = 0
@@ -145,7 +155,7 @@ mailTot = [] #all the emails in all the files for json output
 dbgInfo = [] #a tuple for each file (prefix,mailCt,pageCt,blankCt)
 mailNo = 0
 
-mailList = open(sys.argv[1] + '.json', 'r')
+mailList = open(sys.argv[1], 'r')
 r = mailList.read()  #read in all the bytes into one string
 pdfs = json.loads(r)
 
@@ -218,7 +228,7 @@ for pdf in pdfs: #go thru each pdf in the list
   dbgInfo.append((srcId,mailCt,pageCt,blankCt))
 
 #output results to a file
-with open(sys.argv[2] + '.json', 'w') as f:
+with open(sys.argv[2], 'w') as f:
     #json.dump(mails, f)
     json.dump(mailTot, f)
 
