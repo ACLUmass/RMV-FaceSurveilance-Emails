@@ -10,6 +10,9 @@
 # aaron's python3 environment
 env
 
+# aarons sandbox
+ab_sandbox
+
 # until I hear otherwise, I don't want to store RMV source files in a repo
 data/src/*.pdf
 data/src/*.csv

@@ -1,5 +1,3 @@
-#command line> python pdf2json.py mailList allMails > dbgfile
-
 import sys
 import re
 import json
@@ -12,9 +10,9 @@ from tabulate import tabulate
 
 #sys.argv[1] is a json file of all the email pdfs
 #[['year','filename'],....]
-#filename without pdf extension must be relative to pdf_processing
+#filename must be relative to pdf_processing
 
-#sys.argv[2] is the json file to create without
+#sys.argv[2] is the json file to create contining all the emails as text
 #mailDbg.txt is debugging print statements
 
 
