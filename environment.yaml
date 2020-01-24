@@ -14,6 +14,7 @@ dependencies:
     - sortedcontainers>=2.1.0
     - tabulate>=0.8.6
     - unicodecsv>=0.14.1
+    - fuzzywuzzy>=0.17.0
     - pip:
         - Wand>=0.5.8
         - pdfplumber>=0.5.14
