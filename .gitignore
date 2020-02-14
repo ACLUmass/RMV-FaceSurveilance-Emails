@@ -16,3 +16,7 @@ ab_sandbox
 # until I hear otherwise, I don't want to store RMV source files in a repo
 data/src/*.pdf
 data/src/*.csv
+
+# Website-related files
+website/_site/
+website/Gemfile.lock
