@@ -9,7 +9,7 @@
 title: RMV Face Surveillance Emails
 description: > # this means to ignore newlines until "baseurl:"
   NLP analysis of emails received from the Massachusetts RMV about facial surveillance
-#baseurl: "/default-bundler" # change this to the subpath of your site, e.g. /blog. Leave it empty if you don't need it.
+baseurl: "/rmv-face-surveillance-emails" # change this to the subpath of your site, e.g. /blog. Leave it empty if you don't need it.
 url: "https://https://aclu-of-massachusetts.gitlab.io/rmv-face-surveillance-emails/" # change this to the base hostname & protocol for your site
 github-url: "https://github.com/ACLUmass/RMV-FaceSurveilance-Emails"
 #twitter_username: jekyllrb
