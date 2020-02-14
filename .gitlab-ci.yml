@@ -24,7 +24,13 @@ test:
 pages:
   stage: deploy
   script:
+    - pwd
+    - ls
     - bundle exec jekyll build -d public
+    - ls
+    - ls public
+    - mv public ../public
+    - ls ..
   artifacts:
     paths:
       - public
