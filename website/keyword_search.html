@@ -1,0 +1,12 @@
+---
+layout: page
+title: Keyword Search
+---
+
+<div class="container">
+    {% for email in site.data.allMails %}
+        {{ email["body"] }}
+        <br><br>
+    {% endfor %}
+<!--    {{ site.data.allMails }}-->
+</div>
