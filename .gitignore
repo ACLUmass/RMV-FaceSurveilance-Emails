@@ -20,3 +20,4 @@ data/src/*.csv
 # Website-related files
 website/_site/
 website/Gemfile.lock
+website/.sass-cache
