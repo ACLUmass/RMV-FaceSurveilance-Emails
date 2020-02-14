@@ -8,6 +8,12 @@ variables:
   LC_ALL: C.UTF-8
 
 before_script:
+  - pwd
+  - ls
+  - ls website
+  - ls data
+  - mkdir website/_data
+  - ls website
   - cp data/allMails.json website/_data/
   - cd website
   - bundle install
