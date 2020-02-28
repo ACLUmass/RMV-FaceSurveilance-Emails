@@ -129,6 +129,7 @@ rqCt = 0
 imgChk = re.compile('\.jpeg|\.pdf|\.png|\.gif')
 mailHist = {}
 mailHistCt = 0
+rqDb = []
 for i in range(mailTot):
   tmp = str(mails[i]['body'])
   tmp = tmp.replace('logo.png','')
@@ -155,6 +156,7 @@ for i in range(mailTot):
     else:
       mailHist[fullNm] = 1
       mailHistCt += 1
+    rqDb.append([fullNm,mails[i]['mailId'],mails[i]['from'],mails[i]['date']])
 
 print('histCt = =',mailHistCt)
 
@@ -255,3 +257,15 @@ tbl = tabulate.tabulate(mtbl, headers='firstrow')
 print(tbl)
 
 print('mailCt = ',mailCt,'mailNmCt = ',mailNmCt,'logCt = ',logCt,'logNmCt = ',logNmCt,'hitCt = ',hitCt,'missCt = ',missCt,'hitTot = ',hitTot )
+
+missDb = [['mailId','from','date']]
+for i in range(len(missList)):
+  name = missList[i][0]
+  for rq in  rqDb:
+    if name == rq[0]:
+      missDb.append(rq[1:])
+
+print('$$$$$$$$$$$$$$$$$')
+tbl = tabulate.tabulate(missDb, headers='firstrow')
+print(tbl)
+
