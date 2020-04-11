@@ -27,22 +27,23 @@ class view():
 
 
 ################# Email Reader Subframe ################################
-    self.email = LabelFrame(self.grp, text = "None") #fill the right side of the subframe with an email reader
+    #self.email = LabelFrame(self.grp, text = "None") #fill the right side of the subframe with an email reader
+    self.email = LabelFrame(self.grp) #fill the right side of the subframe with an email reader
     self.email.pack(side=RIGHT)
     self.yscrollbar = Scrollbar(self.email) #put a scrollbar on the right
     self.yscrollbar.pack(side=RIGHT, fill=Y)
 
     self.text = Text(self.email, width=60, height=40,yscrollcommand=self.yscrollbar.set)
-    self.text.insert(INSERT, "Hello......................................................................................................................")
-    self.text.insert(END, "==================================================================================================================Bye Bye.....")
+    #self.text.insert(INSERT, "Hello......................................................................................................................")
+    #self.text.insert(END, "==================================================================================================================Bye Bye.....")
     self.text.config(state=DISABLED)
     self.text.pack()
     self.yscrollbar.config(command=self.text.yview)
 
-    self.text.config(state=NORMAL)
-    self.text.insert(END, "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++whoBye Bye.....")
+    #self.text.config(state=NORMAL)
+    #self.text.insert(END, "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++whoBye Bye.....")
     self.text.config(state=DISABLED)
-    self.email.config(text="MSP4_100_3")
+    #self.email.config(text="MSP4_100_3")
 
 ######################## Control Subframes #################################
     self.ctls = Frame(self.top) #put a group subframe for stats in at the bottom of the window
@@ -54,28 +55,37 @@ class view():
     self.E1.pack(side = LEFT)
 
     #self.B = Button(self.ctls, text = "Hello", command = helloCallBack)
-    self.B = Button(self.ctls, text = "Hello")
+    #self.B = Button(self.ctls, text = "None")
+    self.B = Button(self.ctls)
     self.B.pack(side = LEFT)
 
     #self.C = Button(self.ctls, text = "Bye", command = byeCallBack)
-    self.C = Button(self.ctls, text = "Bye")
+    self.C = Button(self.ctls, text = "Next")
     self.C.pack(side = LEFT)
 
   #pointers to controller parts of callback operations are set her
-  def setCtlBacks(self,helloBack, byeBack):
-    self.B.config(command = helloBack)
-    self.C.config(command = byeBack)
+  def setCtlBacks(self,hypoBack, nextBack):
+    self.B.config(command = hypoBack)
+    self.C.config(command = nextBack)
     #self.B = Button(self.top, text = "Hello", command = callback)
     #self.B.place(x = 50,y = 50)
 
   #view part of all callback operations go here
-  def helloCallBack(self,title,words):
-    self.msg = messagebox.showinfo(title,words)
-  def byeCallBack(self,title,words):
-    self.msg = messagebox.showinfo(title,words)
+  def hypoCallBack(self,hypo):
+    self.B.config(text = hypo)
+    #self.msg = messagebox.showinfo(title,words)
+
+  def nextCallBack(self,mailId,email):
+    self.email.config(text=mailId)
+    #self.msg = messagebox.showinfo(title,words)
+    self.text.config(state=NORMAL)
+    self.text.insert(INSERT, email)
+    self.text.config(state=DISABLED)
+
+
 ##all other stuff
 #  def buttonChg(self,msg):
-    self.B.config(text = msg)
+    #self.B.config(text = msg)
 
   def run(self):
     self.top.mainloop()
