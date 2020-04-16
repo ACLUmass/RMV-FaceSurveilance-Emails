@@ -16,6 +16,10 @@ class view():
     self.stats = Frame(self.grp) #fill the left side of the grp subframe with a statistics frame
     self.stats.pack(side=LEFT,fill=Y)
 
+    #self.E = Button(self.ctls, text = "Bye", command = byeCallBack)
+    self.F = Button(self.stats, text = "runAI")
+    self.F.pack(side = TOP)
+
     self.trainCtLbl = Label(self.stats, text = 'trainCt')
     self.trainCtLbl.pack(side=TOP)
 
@@ -26,6 +30,7 @@ class view():
     self.trainCtDat.pack(side=TOP)
 
 
+
 ################# Email Reader Subframe ################################
     #self.email = LabelFrame(self.grp, text = "None") #fill the right side of the subframe with an email reader
     self.email = LabelFrame(self.grp) #fill the right side of the subframe with an email reader
@@ -33,7 +38,7 @@ class view():
     self.yscrollbar = Scrollbar(self.email) #put a scrollbar on the right
     self.yscrollbar.pack(side=RIGHT, fill=Y)
 
-    self.text = Text(self.email, width=60, height=40,yscrollcommand=self.yscrollbar.set)
+    self.text = Text(self.email, width=80, height=50,yscrollcommand=self.yscrollbar.set)
     #self.text.insert(INSERT, "Hello......................................................................................................................")
     #self.text.insert(END, "==================================================================================================================Bye Bye.....")
     self.text.config(state=DISABLED)
@@ -49,19 +54,33 @@ class view():
     self.ctls = Frame(self.top) #put a group subframe for stats in at the bottom of the window
     self.ctls.pack(side=TOP,fill=X)
 
-    self.L1 = Label(self.ctls, text = "Hypothesis")
-    self.L1.pack( side = LEFT)
-    self.E1 = Entry(self.ctls, bd = 5)
-    self.E1.pack(side = LEFT)
+    #self.D = Button(self.ctls, text = "Bye", command = byeCallBack)
+    self.D = Button(self.ctls, text = "Prev")
+    self.D.pack(side = RIGHT)
+
+    #self.C = Button(self.ctls, text = "Bye", command = byeCallBack)
+    self.C = Button(self.ctls, text = "Next")
+    self.C.pack(side = RIGHT)
 
     #self.B = Button(self.ctls, text = "Hello", command = helloCallBack)
     #self.B = Button(self.ctls, text = "None")
     self.B = Button(self.ctls)
-    self.B.pack(side = LEFT)
+    self.B.pack(side = RIGHT)
 
-    #self.C = Button(self.ctls, text = "Bye", command = byeCallBack)
-    self.C = Button(self.ctls, text = "Next")
-    self.C.pack(side = LEFT)
+    self.E1 = Entry(self.ctls, bd = 5)
+    self.E1.pack(side = RIGHT)
+    self.L1 = Label(self.ctls, text = "Class")
+    self.L1.pack( side = RIGHT)
+
+    #self.E = Button(self.ctls, text = "Bye", command = byeCallBack)
+    self.E = Button(self.ctls, text = "Train")
+    self.E.pack(side = RIGHT)
+
+    #self.D = Button(self.ctls, text = "Bye", command = byeCallBack)
+    self.L2 = Label(self.ctls, text = "Goto")
+    self.L2.pack( side = LEFT)
+    self.E2 = Entry(self.ctls, bd = 5, width=15)
+    self.E2.pack(side = LEFT)
 
   #pointers to controller parts of callback operations are set her
   def setCtlBacks(self,hypoBack, nextBack):
@@ -79,6 +98,7 @@ class view():
     self.email.config(text=mailId)
     #self.msg = messagebox.showinfo(title,words)
     self.text.config(state=NORMAL)
+    self.text.delete(1.0,END)
     self.text.insert(INSERT, email)
     self.text.config(state=DISABLED)
 
