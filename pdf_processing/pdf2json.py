@@ -78,7 +78,8 @@ def mkMailRec(mailNo,mailId,txt):
       email[key] = None
 
   if len(lines) > 0:
-    email['body'] = ''.join(lines) #what's left is the body
+    #email['body'] = ''.join(lines) #what's left is the body
+    email['body'] = ' '.join(lines) #what's left is the body
   else:
     email['body'] =  None
 

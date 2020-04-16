@@ -23,10 +23,12 @@ class model():
         break
     
     text = 'From: ' + mail['from'] + '\n' + 'Date: ' + mail['date'] #format email for display
-    if 'to' in mail.keys():
-      text = text + '\n' + 'To: ' + mail['to']
-    if 'cc' in mail.keys():
-      text = text + '\n' + 'cc: ' + mail['cc']
+    text = text + '\n' + 'To: '
+    if mail['to'] != None:
+      text = text + mail['to']
+    text = text + '\n' + 'cc: '
+    if mail['cc'] != None:
+      text = text + mail['cc']
     text = text + '\n' + mail['body']
 
     return(mail['mailId'],text)
