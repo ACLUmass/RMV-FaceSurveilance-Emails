@@ -12,24 +12,31 @@ hypo = "True "
 m = model.model(sys.argv[1])
 
 #create all the controller methods that the view object uses as callbacks
-def hypoCallBack():
+def hypoCback():
   global hypo  #NOTE - this belongs in model
   #put controller part of callback response here.......
   if hypo == "True ":
     hypo = "False"
   else:
     hypo = "True "
+  v.hypoVback(hypo) #view part of callback is here
 
-  v.hypoCallBack(hypo) #view part of callback is here
-  #v.buttonChg('bye')
-
-def nextCallBack():
-  #put controller part of callback response here.......
-  #mailId="MSP4_100_3"
-  #email="+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++whoBye Bye....."
+def nextCback():
   (mailId,email) = m.getMail()
-  v.nextCallBack(mailId,email) #view part of callback is here
+  v.nextVback(mailId,email) #view part of callback is here
 
-v.hypoCallBack(hypo)
-v.setCtlBacks(hypoCallBack,nextCallBack) #give view pointers to controller callback methods
+def prevCback():
+  return
+
+def modeCback():
+  return
+
+def gotoCback():
+  return
+
+def runAICback():
+  return
+
+v.hypoVback(hypo)
+v.setVbacks(hypoCback,nextCback,prevCback,modeCback,gotoCback,runAICback) #give view pointers to controller callback methods
 v.run() #run the tkinter loop
