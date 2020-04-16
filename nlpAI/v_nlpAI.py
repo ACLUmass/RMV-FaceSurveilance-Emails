@@ -32,38 +32,28 @@ class view():
 
 
 ################# Email Reader Subframe ################################
-    #self.email = LabelFrame(self.grp, text = "None") #fill the right side of the subframe with an email reader
     self.email = LabelFrame(self.grp) #fill the right side of the subframe with an email reader
     self.email.pack(side=RIGHT)
     self.yscrollbar = Scrollbar(self.email) #put a scrollbar on the right
     self.yscrollbar.pack(side=RIGHT, fill=Y)
 
     self.text = Text(self.email, width=80, height=50,yscrollcommand=self.yscrollbar.set)
-    #self.text.insert(INSERT, "Hello......................................................................................................................")
-    #self.text.insert(END, "==================================================================================================================Bye Bye.....")
     self.text.config(state=DISABLED)
     self.text.pack()
     self.yscrollbar.config(command=self.text.yview)
 
-    #self.text.config(state=NORMAL)
-    #self.text.insert(END, "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++whoBye Bye.....")
     self.text.config(state=DISABLED)
-    #self.email.config(text="MSP4_100_3")
 
 ######################## Control Subframes #################################
     self.ctls = Frame(self.top) #put a group subframe for stats in at the bottom of the window
     self.ctls.pack(side=TOP,fill=X)
 
-    #self.D = Button(self.ctls, text = "Bye", command = byeCallBack)
     self.D = Button(self.ctls, text = "Prev")
     self.D.pack(side = RIGHT)
 
-    #self.C = Button(self.ctls, text = "Bye", command = byeCallBack)
     self.C = Button(self.ctls, text = "Next")
     self.C.pack(side = RIGHT)
 
-    #self.B = Button(self.ctls, text = "Hello", command = helloCallBack)
-    #self.B = Button(self.ctls, text = "None")
     self.B = Button(self.ctls)
     self.B.pack(side = RIGHT)
 
@@ -72,41 +62,50 @@ class view():
     self.L1 = Label(self.ctls, text = "Class")
     self.L1.pack( side = RIGHT)
 
-    #self.E = Button(self.ctls, text = "Bye", command = byeCallBack)
     self.E = Button(self.ctls, text = "Train")
     self.E.pack(side = RIGHT)
 
-    #self.D = Button(self.ctls, text = "Bye", command = byeCallBack)
     self.L2 = Label(self.ctls, text = "Goto")
     self.L2.pack( side = LEFT)
     self.E2 = Entry(self.ctls, bd = 5, width=15)
     self.E2.pack(side = LEFT)
 
-  #pointers to controller parts of callback operations are set her
-  def setCtlBacks(self,hypoBack, nextBack):
-    self.B.config(command = hypoBack)
-    self.C.config(command = nextBack)
-    #self.B = Button(self.top, text = "Hello", command = callback)
-    #self.B.place(x = 50,y = 50)
+##all other stuff
+  def run(self):
+    self.top.mainloop()
 
-  #view part of all callback operations go here
-  def hypoCallBack(self,hypo):
-    self.B.config(text = hypo)
-    #self.msg = messagebox.showinfo(title,words)
-
-  def nextCallBack(self,mailId,email):
+  def ldEmail(self,mailId,email):
     self.email.config(text=mailId)
-    #self.msg = messagebox.showinfo(title,words)
     self.text.config(state=NORMAL)
     self.text.delete(1.0,END)
     self.text.insert(INSERT, email)
     self.text.config(state=DISABLED)
 
+  #pointers to controller parts of callback operations are set her
+  def setVbacks(self,hypoCback, nextCback,prevCback,modeCback,gotoCback,runAICback):
+    self.B.config(command = hypoCback)
+    self.C.config(command = nextCback)
+    self.D.config(command = prevCback)
+    self.E.config(command = modeCback)
+    self.E2.bind('<Return>', gotoCback)
+    self.F.config(command = runAICback)
 
-##all other stuff
-#  def buttonChg(self,msg):
-    #self.B.config(text = msg)
+  #view part of all callback operations go here
+  def hypoVback(self,msg):
+    self.B.config(text = msg)
 
-  def run(self):
-    self.top.mainloop()
+  def nextVback(self,mailId,email):
+    self.ldEmail(mailId,email)
+
+  def prevVback(self,mailId,email):
+    self.ldEmail(mailId,email)
+
+  def modeVback(self,msg):
+    self.E.config(text = msg)
+
+  def gotoVback(self,mailId,email):
+    self.ldEmail(mailId,email)
+
+  def runAIVback(self,msg):
+    self.F.config(text = msg)
 
