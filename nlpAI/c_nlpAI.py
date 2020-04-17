@@ -21,10 +21,18 @@ class ctl():
     self.v.hypoVback(self.hypo) #view part of callback is here
 
   def nextCback(self):
-    (mailId,email) = self.m.getMail()
+    if self.mode == "Read":
+      (mailId,email) = self.m.getReadMail(True)
+    else:
+      (mailId,email) = self.m.getTrainMail(True)
     self.v.nextVback(mailId,email) #view part of callback is here
 
   def prevCback(self):
+    if self.mode == "Read":
+      (mailId,email) = self.m.getReadMail(False)
+    else:
+      (mailId,email) = self.m.getTrainMail(False)
+    self.v.nextVback(mailId,email) #view part of callback is here
     return
 
   def modeCback(self):

@@ -31,7 +31,7 @@ class view():
 
 
 ################# Email Reader Subframe ################################
-    self.email = LabelFrame(self.grp) #fill the right side of the subframe with an email reader
+    self.email = LabelFrame(self.grp, text = 'none') #fill the right side of the subframe with an email reader
     self.email.pack(side=RIGHT)
     self.yscrollbar = Scrollbar(self.email) #put a scrollbar on the right
     self.yscrollbar.pack(side=RIGHT, fill=Y)
