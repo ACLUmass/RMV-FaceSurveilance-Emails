@@ -2,6 +2,17 @@
 import json
 import random
 
+#email states
+#AI       train       comment
+#======================================================
+#none     n/a         AI has not been run
+#false    none        untrained negative
+#true     none        untrained positive
+#false    false       true negative
+#true     true        true positive
+#false    true        false negative - low sensitivity
+#true     false       false positive - low specificity
+
 class model():
   def __init__(self,fileNm): #setup everything without controller callbacks
     #build a database of all the emails with images
@@ -25,27 +36,35 @@ class model():
 
     return(mail['mailId'],text)
 
-  #
-  def getTrainMail(self,fwd):
-    if fwd == True: #randomly pick untrained email
-      if self.trainCt == self.mailCt: #nothing left to train
-        return('none','all trained')
-      while True: #find a mail that has not been trained already
-        idx = random.randint(0,self.mailCt - 1) 
-        if not 'train' in  self.mails[idx].keys():
-          break
-      if self.idx != None:
-        self.trains.append(self.idx) #put idx on list for going in reverse
-      self.idx = idx
-    else:
-      if len(self.trains) == 0: #walked all the way back
-        self.idx = None
-        return('none','all the way back')
-      self.idx = self.trains.pop()
+  #add training to current email and fetch a new random one to train
+  def getNextTrain(self,hypo):
+    if self.trainCt == self.mailCt: #nothing left to train
+      return('none','all trained')
+    while True: #find a mail that has not been trained already
+      idx = random.randint(0,self.mailCt - 1) 
+      if not 'train' in  self.mails[idx].keys():
+        break
+    if self.idx != None:
+      self.mails[self.idx]['train'] = hypo
+      self.trains.append(self.idx) #put idx on list for going in reverse
+    self.idx = idx
 
     mail = self.mails[self.idx]
     return(self.formText(mail))
 
+  #update training to current email and fetch previously trained email plus its training
+  def getPrevTrain(self):
+    if len(self.trains) == 0: #walked all the way back
+      self.idx = None
+      #return('none','all the way back','None')
+      return(('none','all the way back'),'None')
+    self.idx = self.trains.pop()
+
+    mail = self.mails[self.idx]
+    #return(self.formText(mail),self.mails[self.idx]['train'])
+    return(self.formText(mail),mail['train'])
+
+  #get next or previous email linearly plus its current AI state
   def getReadMail(self,fwd):
     if fwd == True: #move the index forward.
       if self.idx == None:
