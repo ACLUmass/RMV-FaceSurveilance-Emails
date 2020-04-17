@@ -16,9 +16,8 @@ class view():
     self.stats = Frame(self.grp) #fill the left side of the grp subframe with a statistics frame
     self.stats.pack(side=LEFT,fill=Y)
 
-    #self.E = Button(self.ctls, text = "Bye", command = byeCallBack)
-    self.F = Button(self.stats, text = "runAI")
-    self.F.pack(side = TOP)
+    self.runAI = Button(self.stats, text = "runAI")
+    self.runAI.pack(side = TOP)
 
     self.trainCtLbl = Label(self.stats, text = 'trainCt')
     self.trainCtLbl.pack(side=TOP)
@@ -48,27 +47,27 @@ class view():
     self.ctls = Frame(self.top) #put a group subframe for stats in at the bottom of the window
     self.ctls.pack(side=TOP,fill=X)
 
-    self.D = Button(self.ctls, text = "Prev")
-    self.D.pack(side = RIGHT)
+    self.prev = Button(self.ctls, text = "Prev")
+    self.prev.pack(side = RIGHT)
 
-    self.C = Button(self.ctls, text = "Next")
-    self.C.pack(side = RIGHT)
+    self.next = Button(self.ctls, text = "Next")
+    self.next.pack(side = RIGHT)
 
-    self.B = Button(self.ctls)
-    self.B.pack(side = RIGHT)
+    self.hypo = Button(self.ctls, width = 5)
+    self.hypo.pack(side = RIGHT)
 
     self.E1 = Entry(self.ctls, bd = 5)
     self.E1.pack(side = RIGHT)
     self.L1 = Label(self.ctls, text = "Class")
     self.L1.pack( side = RIGHT)
 
-    self.E = Button(self.ctls, text = "Train")
-    self.E.pack(side = RIGHT)
+    self.mode = Button(self.ctls, width=6)
+    self.mode.pack(side = RIGHT)
 
     self.L2 = Label(self.ctls, text = "Goto")
     self.L2.pack( side = LEFT)
-    self.E2 = Entry(self.ctls, bd = 5, width=15)
-    self.E2.pack(side = LEFT)
+    self.goto = Entry(self.ctls, bd = 5, width=15)
+    self.goto.pack(side = LEFT)
 
 ##all other stuff
   def run(self):
@@ -83,16 +82,16 @@ class view():
 
   #pointers to controller parts of callback operations are set her
   def setVbacks(self,hypoCback, nextCback,prevCback,modeCback,gotoCback,runAICback):
-    self.B.config(command = hypoCback)
-    self.C.config(command = nextCback)
-    self.D.config(command = prevCback)
-    self.E.config(command = modeCback)
-    self.E2.bind('<Return>', gotoCback)
-    self.F.config(command = runAICback)
+    self.hypo.config(command = hypoCback)
+    self.next.config(command = nextCback)
+    self.prev.config(command = prevCback)
+    self.mode.config(command = modeCback)
+    self.goto.bind('<Return>', gotoCback)
+    self.runAI.config(command = runAICback)
 
   #view part of all callback operations go here
   def hypoVback(self,msg):
-    self.B.config(text = msg)
+    self.hypo.config(text = msg)
 
   def nextVback(self,mailId,email):
     self.ldEmail(mailId,email)
@@ -101,11 +100,11 @@ class view():
     self.ldEmail(mailId,email)
 
   def modeVback(self,msg):
-    self.E.config(text = msg)
+    self.mode.config(text = msg)
 
   def gotoVback(self,mailId,email):
     self.ldEmail(mailId,email)
 
   def runAIVback(self,msg):
-    self.F.config(text = msg)
+    self.runAI.config(text = msg)
 
