@@ -50,19 +50,19 @@ class model():
     self.idx = idx
 
     mail = self.mails[self.idx]
-    return(self.formText(mail))
+    mailId,email =  self.formText(mail)
+    return(mailId,email)
 
   #update training to current email and fetch previously trained email plus its training
   def getPrevTrain(self):
     if len(self.trains) == 0: #walked all the way back
       self.idx = None
-      #return('none','all the way back','None')
-      return(('none','all the way back'),'None')
+      return('none','all the way back','None')
     self.idx = self.trains.pop()
 
     mail = self.mails[self.idx]
-    #return(self.formText(mail),self.mails[self.idx]['train'])
-    return(self.formText(mail),mail['train'])
+    mailId,email =  self.formText(mail)
+    return(mailId,email,mail['train'])
 
   #get next or previous email linearly plus its current AI state
   def getReadMail(self,fwd):
@@ -83,3 +83,14 @@ class model():
       mail = self.mails[self.idx]
       return(self.formText(mail))
 
+  #goto a mailId
+  def getGotoMail(self,gotoId):
+    for self.idx in range(0,self.mailCt): #search from the beginning
+      if self.mails[self.idx]['mailId'] == gotoId:
+        break
+    else: #didn't find a match
+      return('none','not found')
+
+    mail = self.mails[self.idx]
+    mailId,email =  self.formText(mail) #found it!
+    return(mailId,email)

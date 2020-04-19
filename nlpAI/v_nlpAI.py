@@ -11,7 +11,6 @@ class view():
     self.grp = Frame(self.top) #put a group subframe for stats and email at the top of window
     self.grp.pack(side=TOP)
 
-
 ######################## Stats Subframe #################################
     self.stats = Frame(self.grp) #fill the left side of the grp subframe with a statistics frame
     self.stats.pack(side=LEFT,fill=Y)
@@ -88,6 +87,9 @@ class view():
     self.mode.config(command = modeCback)
     self.goto.bind('<Return>', gotoCback)
     self.runAI.config(command = runAICback)
+
+  def getGotoId(self): #get the contents of goto Entry box
+    return self.goto.get()
 
   #view part of all callback operations go here
   def hypoVback(self,msg):

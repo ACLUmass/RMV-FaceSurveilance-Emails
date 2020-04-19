@@ -31,7 +31,7 @@ class ctl():
     if self.mode == "Read":
       (mailId,email) = self.m.getReadMail(False)
     else:
-      (mailId,email),self.hypo = self.m.getPrevTrain()
+      mailId,email,self.hypo = self.m.getPrevTrain()
     self.v.hypoVback(self.hypo)
     self.v.nextVback(mailId,email) #view part of callback is here
     return
@@ -46,7 +46,11 @@ class ctl():
       self.mode = "Train"
     self.v.modeVback(self.mode) #view part of callback is here
 
-  def gotoCback(self):
+  def gotoCback(self,dummy): #dummy is the return character that we don't need
+    gotoId = self.v.getGotoId()  #get the mailID from the entry box
+    mailId,email = self.m.getGotoMail(gotoId)
+    self.v.gotoVback(mailId,email) #view part of callback is here
+    
     return
 
   def runAICback(self):
