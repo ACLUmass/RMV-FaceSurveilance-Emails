@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 #https://sukhbinder.wordpress.com/2014/12/25/an-example-of-model-view-controller-design-pattern-with-tkinter-python/
 import sys
+import statsLib as stats
 import v_nlpAI as view
 import m_nlpAI as model
 
@@ -50,7 +51,14 @@ class ctl():
     gotoId = self.v.getGotoId()  #get the mailID from the entry box
     mailId,email = self.m.getGotoMail(gotoId)
     self.v.gotoVback(mailId,email) #view part of callback is here
-    
+    return
+
+
+  def confCback(self,dummy): #dummy is the return character that we don't need
+    conf = self.v.conf.getVal()  #get the confidence value
+    sz = stats.samSz(int(conf)/100.0,0.50,self.m.mailCt)
+    self.v.trainNeedLbl.setVal(int(sz))
+    #print('dbg0',conf)
     return
 
   def runAICback(self):
@@ -59,7 +67,16 @@ class ctl():
   def run(self):
     self.v.hypoVback(self.hypo)
     self.v.modeVback(self.mode)
-    self.v.setVbacks(self.hypoCback,self.nextCback,self.prevCback,self.modeCback,self.gotoCback,self.runAICback) #give view pointers to controller callback methods
+    self.v.setVbacks(self.hypoCback,self.nextCback,self.prevCback,self.modeCback,self.gotoCback,self.runAICback,self.confCback) #give view pointers to controller callback methods
+
+    #self.v.trainNeedLbl.setVal('76')
+    self.v.trainedLbl.setVal('33')
+    self.v.trueLbl.setVal('15')
+    #self.v.classified.setVal('1500')
+    self.v.mailCt.setVal(self.m.mailCt)
+    self.v.trueClass.setVal('150')
+    self.v.falsePos.setVal('15')
+    self.v.falseNeg.setVal('15')
     self.v.run() #run the tkinter loop
 
 #create the view object first because it will be needed in callbacks

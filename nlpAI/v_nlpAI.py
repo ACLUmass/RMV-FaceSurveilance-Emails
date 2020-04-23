@@ -5,21 +5,28 @@ from tkinter import *
 from tkinter import messagebox
 
 class lblVal():
-  def __init__(self,root,label,val):
+  def __init__(self,root,label):
     #self.lblFr = LabelFrame(root, text = label, labelanchor = 'w')
     self.lblFr = LabelFrame(root, text = label)
     self.lblFr.pack(side=TOP)
-    self.entry = Label(self.lblFr, text = val, width=10)
-    self.entry.pack(side = TOP)
+    #self.entry = Label(self.lblFr, text = val, width=10)
+    self.val = Label(self.lblFr,  width=10)
+    self.val.pack(side = TOP)
+
+  def setVal(self,val):
+    self.val.config(text = val)
 
 
 class lblEntry():
-  def __init__(self,root,label,entry):
+  def __init__(self,root,label):
     #self.lblFr = LabelFrame(root, text = label, labelanchor = 'w')
     self.lblFr = LabelFrame(root, text = label)
     self.lblFr.pack(side=TOP)
-    self.entry = Entry(self.lblFr, text = entry, width=10, bd=5)
+    self.entry = Entry(self.lblFr, width=10, bd=5)
     self.entry.pack(side = TOP)
+
+  def getVal(self):
+    return self.entry.get()
 
 
 class view():
@@ -33,32 +40,18 @@ class view():
     self.stats = Frame(self.grp) #fill the left side of the grp subframe with a statistics frame
     self.stats.pack(side=LEFT,fill=Y)
 
+    self.conf = lblEntry(self.stats, 'confidence %')
     self.runAI = Button(self.stats, text = "runAI")
     self.runAI.pack(side = TOP)
 
-    self.trainOk = Button(self.stats, text = "good")
-    self.trainOk.pack(side = TOP)
-
-    #self.confidenceLbl = lblEntry(self.stats, 'confidence %', '95')
-    #self.trainOk = StringVar()
-    #self.trainOkLbl = Label(self.stats, textvariable = self.trainOk)
-    #self.trainOkLbl.pack(side=TOP)
-
-    self.confidenceLbl = lblEntry(self.stats, 'confidence %', '95')
-
-    self.trainNeedLbl = lblVal(self.stats, 'train needed', '76')
-
-    self.trainedLbl = lblVal(self.stats, 'trained', '33')
-
-    self.trueLbl = lblVal(self.stats, 'True', '15')
-
-    self.classified = lblVal(self.stats, 'classified', '1500')
-
-    self.trueClass = lblVal(self.stats, 'True Class', '150')
-
-    self.falsePos = lblVal(self.stats, 'False Pos', '15')
-
-    self.falseNeg = lblVal(self.stats, 'False Neg', '15')
+    self.trainResult = lblVal(self.stats, 'train result')
+    self.trainNeedLbl = lblVal(self.stats, 'train needed')
+    self.trainedLbl = lblVal(self.stats, 'trained')
+    self.trueLbl = lblVal(self.stats, 'True')
+    self.mailCt = lblVal(self.stats, 'mail count')
+    self.trueClass = lblVal(self.stats, 'True Class')
+    self.falsePos = lblVal(self.stats, 'False Pos')
+    self.falseNeg = lblVal(self.stats, 'False Neg')
 
 
 ################# Email Reader Subframe ################################
@@ -112,13 +105,14 @@ class view():
     self.text.config(state=DISABLED)
 
   #pointers to controller parts of callback operations are set her
-  def setVbacks(self,hypoCback, nextCback,prevCback,modeCback,gotoCback,runAICback):
+  def setVbacks(self,hypoCback, nextCback,prevCback,modeCback,gotoCback,runAICback,confCback):
     self.hypo.config(command = hypoCback)
     self.next.config(command = nextCback)
     self.prev.config(command = prevCback)
     self.mode.config(command = modeCback)
     self.goto.bind('<Return>', gotoCback)
     self.runAI.config(command = runAICback)
+    self.conf.entry.bind('<Return>', confCback)
 
   def getGotoId(self): #get the contents of goto Entry box
     return self.goto.get()
@@ -141,4 +135,7 @@ class view():
 
   def runAIVback(self,msg):
     self.runAI.config(text = msg)
+
+  def getConf(self): #get the contents of confidence Entry box
+    return self.conf.getVal()
 
