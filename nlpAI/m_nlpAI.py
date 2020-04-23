@@ -21,6 +21,7 @@ class model():
     self.mails = json.loads(r)
     self.mailCt = len(self.mails)
     self.trainCt = 0
+    self.trainTrue = 0
     self.idx = None
     self.trains = [] #in train mode mailIdx moves forward randomly and backward by popping off this list
 
@@ -46,6 +47,9 @@ class model():
         break
     if self.idx != None:
       self.mails[self.idx]['train'] = hypo
+      self.trainCt += 1
+      if hypo == "True":
+        self.trainTrue += 1
       self.trains.append(self.idx) #put idx on list for going in reverse
     self.idx = idx
 
