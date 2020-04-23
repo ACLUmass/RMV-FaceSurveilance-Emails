@@ -47,11 +47,11 @@ class view():
     self.trainResult = lblVal(self.stats, 'train result')
     self.trainNeedLbl = lblVal(self.stats, 'train needed')
     self.trainedLbl = lblVal(self.stats, 'trained')
-    self.trueLbl = lblVal(self.stats, 'True')
+    self.trueLbl = lblVal(self.stats, 'trained true')
     self.mailCt = lblVal(self.stats, 'mail count')
-    self.trueClass = lblVal(self.stats, 'True Class')
-    self.falsePos = lblVal(self.stats, 'False Pos')
-    self.falseNeg = lblVal(self.stats, 'False Neg')
+    self.trueClass = lblVal(self.stats, 'good AI true')
+    self.falsePos = lblVal(self.stats, 'bad AI true')
+    self.falseNeg = lblVal(self.stats, 'bad AI false')
 
 
 ################# Email Reader Subframe ################################

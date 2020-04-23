@@ -26,6 +26,8 @@ class ctl():
       (mailId,email) = self.m.getReadMail(True)
     else:
       mailId,email = self.m.getNextTrain(self.hypo)
+    self.v.trainedLbl.setVal(self.m.trainCt)
+    self.v.trueLbl.setVal(self.m.trainTrue)
     self.v.nextVback(mailId,email) #view part of callback is here
 
   def prevCback(self):
@@ -70,13 +72,12 @@ class ctl():
     self.v.setVbacks(self.hypoCback,self.nextCback,self.prevCback,self.modeCback,self.gotoCback,self.runAICback,self.confCback) #give view pointers to controller callback methods
 
     #self.v.trainNeedLbl.setVal('76')
-    self.v.trainedLbl.setVal('33')
-    self.v.trueLbl.setVal('15')
-    #self.v.classified.setVal('1500')
+    self.v.trainedLbl.setVal(self.m.trainCt)
+    self.v.trueLbl.setVal(self.m.trainTrue)
     self.v.mailCt.setVal(self.m.mailCt)
-    self.v.trueClass.setVal('150')
-    self.v.falsePos.setVal('15')
-    self.v.falseNeg.setVal('15')
+    #self.v.trueClass.setVal('150')
+    #self.v.falsePos.setVal('15')
+    #self.v.falseNeg.setVal('15')
     self.v.run() #run the tkinter loop
 
 #create the view object first because it will be needed in callbacks
