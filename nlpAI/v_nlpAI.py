@@ -4,6 +4,24 @@ from tkinter import *
 
 from tkinter import messagebox
 
+class lblVal():
+  def __init__(self,root,label,val):
+    #self.lblFr = LabelFrame(root, text = label, labelanchor = 'w')
+    self.lblFr = LabelFrame(root, text = label)
+    self.lblFr.pack(side=TOP)
+    self.entry = Label(self.lblFr, text = val, width=10)
+    self.entry.pack(side = TOP)
+
+
+class lblEntry():
+  def __init__(self,root,label,entry):
+    #self.lblFr = LabelFrame(root, text = label, labelanchor = 'w')
+    self.lblFr = LabelFrame(root, text = label)
+    self.lblFr.pack(side=TOP)
+    self.entry = Entry(self.lblFr, text = entry, width=10, bd=5)
+    self.entry.pack(side = TOP)
+
+
 class view():
   def __init__(self): #setup everything without controller callbacks
     #layout the frames in the top window
@@ -18,15 +36,29 @@ class view():
     self.runAI = Button(self.stats, text = "runAI")
     self.runAI.pack(side = TOP)
 
-    self.trainCtLbl = Label(self.stats, text = 'trainCt')
-    self.trainCtLbl.pack(side=TOP)
+    self.trainOk = Button(self.stats, text = "good")
+    self.trainOk.pack(side = TOP)
 
-    self.trainCt = StringVar()
-    self.trainCtDat = Label(self.stats, textvariable = self.trainCt, relief = RAISED )
+    #self.confidenceLbl = lblEntry(self.stats, 'confidence %', '95')
+    #self.trainOk = StringVar()
+    #self.trainOkLbl = Label(self.stats, textvariable = self.trainOk)
+    #self.trainOkLbl.pack(side=TOP)
 
-    self.trainCt.set("430")
-    self.trainCtDat.pack(side=TOP)
+    self.confidenceLbl = lblEntry(self.stats, 'confidence %', '95')
 
+    self.trainNeedLbl = lblVal(self.stats, 'train needed', '76')
+
+    self.trainedLbl = lblVal(self.stats, 'trained', '33')
+
+    self.trueLbl = lblVal(self.stats, 'True', '15')
+
+    self.classified = lblVal(self.stats, 'classified', '1500')
+
+    self.trueClass = lblVal(self.stats, 'True Class', '150')
+
+    self.falsePos = lblVal(self.stats, 'False Pos', '15')
+
+    self.falseNeg = lblVal(self.stats, 'False Neg', '15')
 
 
 ################# Email Reader Subframe ################################
