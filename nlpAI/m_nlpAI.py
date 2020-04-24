@@ -33,6 +33,12 @@ class model():
     text = text + '\n' + 'cc: '
     if mail['cc'] != None:
       text = text + mail['cc']
+    text = text + '\n' + 'attach: '
+    if mail['attach'] != None:
+      text = text + mail['attach']
+    text = text + '\n' + 'subject: '
+    if mail['subject'] != None:
+      text = text + mail['subject']
     text = text + '\n' + mail['body']
 
     return(mail['mailId'],text)
