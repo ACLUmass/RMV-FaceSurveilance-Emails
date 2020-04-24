@@ -55,31 +55,39 @@ def mkMailRec(mailNo,mailId,txt):
   email['mailId'] = mailId #useful for locating email in pdf
   lines = txt.splitlines() 
   #for key in ['from','to','date','sent','cc']:
-  for key in ['from','to','date','cc']:
+  #for key in ['from','to','date','cc']:
+  for key in ['from','to','date','cc','subject','attach']:
     for i in range(len(lines)):
       #chk = re.match('\s*' + key + ':',lines[i],re.IGNORECASE)
       if key == 'date': 
         chk = re.match('>*\s*' + key + ':',lines[i],re.IGNORECASE)
         chk = re.match('>*\s*(date|sent):',lines[i],re.IGNORECASE)
+      elif key == 'attach': 
+        chk = re.match('>*\s*attach\w*:',lines[i],re.IGNORECASE)
       else:
         chk = re.match('>*\s*' + key + ':',lines[i],re.IGNORECASE)
-      if chk:
-        line = lines.pop(i)
+      if chk: #if this block is executed you break out of for loop, so popping is OK
+        #line = lines.pop(i)
         keyEnd = chk.span()[1]
-        if keyEnd < len(line):
+
+        if key == 'attach' and i < len(lines) - 1: #Not general since there may be other headers with multiple lines
+          for j in range(i+1,len(lines)): 
+            if re.search('\.jpeg|\.pdf|\.png|\.gif|\.jpg|\.JPG',lines[j],re.IGNORECASE) == None:
+              break
+
+          line = ' '.join(lines[i:j])
           email[key] = line[keyEnd:] 
-        else:  #there are a few cases where the data ends up on the next line
-          if i < len(lines):  #we have a next line
-            email[key] = lines.pop(i)
-          else:
-            email[key] = None
+          del lines[i:j]
+        else:
+          line = lines.pop(i)
+          email[key] = line[keyEnd:]
+
         break
     else:
       email[key] = None
 
-  if len(lines) > 0:
-    #email['body'] = ''.join(lines) #what's left is the body
-    email['body'] = ' '.join(lines) #what's left is the body
+  if len(lines) > 0: #what's left is the body
+    email['body'] = ' '.join(lines)
   else:
     email['body'] =  None
 
@@ -93,6 +101,10 @@ def mkMailRec(mailNo,mailId,txt):
   #msp3_242_2 and ones like it can't be fixed because somebody retyped the info without the identifying header stuff
   #msp3 all other missing fields have been redacted or heading has been omitted
   #fr3_29_2 is screwed up by pdfplumber. It gets the page breaks in the wrong place and finditer misses a from: fr5_10_2 and fr6_146_2 have the same problem
+
+  for key in ['from','to','date','cc','subject','attach']:
+    if not key in email.keys():
+      email[key] = None
      
   return email
 
@@ -235,8 +247,10 @@ with open(sys.argv[2], 'w') as f:
 #for mail in mails:
 for mail in mailTot:
   print('=============')
-  print(mail)
+  #print(mail)
   #for key in ['mailNo','mailId','from','to','date','cc','subject','body']:
+  for key in ['mailNo','mailId','from','to','date','cc','subject','attach','body']:
+    print(key, ': ' , mail[key])
 
 print('0^^^^^^^^^^^^^^^^^^^^^^')
 cols = ['mailId','from','date']

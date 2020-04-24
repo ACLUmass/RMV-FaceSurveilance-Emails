@@ -40,16 +40,17 @@ class view():
     self.stats = Frame(self.grp) #fill the left side of the grp subframe with a statistics frame
     self.stats.pack(side=LEFT,fill=Y)
 
-    self.conf = lblEntry(self.stats, 'confidence %')
-    self.runAI = Button(self.stats, text = "runAI")
+    self.statsPad = Frame(self.stats,height=9)
+    self.statsPad.pack(side = TOP)
+    self.runAI = Button(self.stats, text = "runAI",width=10,height=2,bg='green')
     self.runAI.pack(side = TOP)
-
+    self.conf = lblEntry(self.stats, 'confidence %')
     self.trainResult = lblVal(self.stats, 'train result')
     self.trainNeedLbl = lblVal(self.stats, 'train needed')
     self.trainedLbl = lblVal(self.stats, 'trained')
     self.trueLbl = lblVal(self.stats, 'trained true')
     self.mailCt = lblVal(self.stats, 'mail count')
-    self.trueClass = lblVal(self.stats, 'good AI true')
+    self.trueClass = lblVal(self.stats, 'AI true')
     self.falsePos = lblVal(self.stats, 'bad AI true')
     self.falseNeg = lblVal(self.stats, 'bad AI false')
 
@@ -71,6 +72,9 @@ class view():
     self.ctls = Frame(self.top) #put a group subframe for stats in at the bottom of the window
     self.ctls.pack(side=TOP,fill=X)
 
+    self.ctlsPad = Frame(self.ctls,width=5)
+    self.ctlsPad.pack(side = TOP)
+    self.ctlsPad.pack(side = RIGHT)
     self.prev = Button(self.ctls, text = "Prev")
     self.prev.pack(side = RIGHT)
 
