@@ -24,9 +24,22 @@ class model():
     self.trainTrue = 0
     self.idx = None
     self.trains = [] #in train mode mailIdx moves forward randomly and backward by popping off this list
+    for i in range(self.mailCt):
+      if 'train' in self.mails[i]:
+        self.trainCt += 1
+        if self.mails[i]['train'] == 'True':
+          self.trainTrue += 1
+
+  def fileSv(self,fileNm): #save the results
+    with open(fileNm, 'w') as f:
+      json.dump(self.mails, f)
+
 
   def formText(self,mail):
-    text = 'From: ' + mail['from'] + '\n' + 'Date: ' + mail['date'] #format email for display
+    text = 'From: ' + mail['from'] #format email for display
+    text = text + '\n' + 'Date: '
+    if mail['date'] != None:
+      text = text + mail['date']
     text = text + '\n' + 'To: '
     if mail['to'] != None:
       text = text + mail['to']
@@ -76,6 +89,26 @@ class model():
 
   #get next or previous email linearly plus its current AI state
   def getReadMail(self,fwd):
+    if fwd == True: #move the index forward.
+      if self.idx == None:
+        self.idx = 0
+      elif self.idx < self.mailCt:
+        self.idx += 1
+    else: #move index backward
+      if self.idx == None:
+        self.idx = self.mailCt - 1
+      elif self.idx > -1:
+        self.idx -= 1
+
+    if self.idx == self.mailCt or self.idx == -1: #signal that index is out of bounds
+      return('none','out of bounds')
+    else: #get the email
+      mail = self.mails[self.idx]
+      return(self.formText(mail))
+
+
+  #get next or previous email that matches AI hypo
+  def getSearchMail(self,fwd,hypo):
     if fwd == True: #move the index forward.
       if self.idx == None:
         self.idx = 0

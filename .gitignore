@@ -9,6 +9,8 @@
 
 # aaron's python3 environment
 env
+ext_doc
+nlpAI/__pycache__
 
 # aarons sandbox
 ab_sandbox
