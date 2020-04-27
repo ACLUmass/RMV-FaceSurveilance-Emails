@@ -10,11 +10,13 @@ NLP analysis of emails received from the RMV about facial surveillance
 │   └── email_exploration.ipynb     - preliminary Jupyter notebook for email exploration
 ├── pdf_processing/
 │   ├── pdf2json.py                 - program to convert all email pdf sources to one json object
-│   └── csv2json.py                 - program to convert facial recognition csv log sources to one json object
+│   ├── csv2json.py                 - program to convert facial recognition csv log sources to one json object
+│   └── rmvDups.py                  - program to remove duplicate emails from json of all emails
 └── data/        
     ├── json_structs.txt            - description of the json objects created from RMV sources
-    ├── allMails.json               - output of pdf2json.py because the sources to generate it are not
-    ├── allLogs.json                - output of csv2json.py because the sources to generate it are not
+    ├── allMails.json               - output of pdf2json.py
+    ├── allLogs.json                - output of csv2json.py
+    ├── nodupsMail.json             - version of allMails.json with duplicates removed 
     └── src                         
         ├── mailList.json           - paths to all all the RMV pdfs in src to convert
         ├── logList.json            - paths to all all the RMV csv in src to convert
@@ -24,9 +26,9 @@ NLP analysis of emails received from the RMV about facial surveillance
 
 ## Architecture Considerations
 Since the original data sources from the RMV are not saved on github, the json generating programs cannot be cloned and run on any machine. 
-Only people with permission to download  those data sources from the ACLU's google drive (Lauren, Kade, me and maybe others) can do that.
+Only people with permission to download  those data sources from the ACLU's google drive (Lauren, Kade, Aaron and maybe others) can do that.
 
-The json objects produced are described in int_docs/json_structs.txt and should be usable by both pandas and tinyDB. 
+The json objects produced are described in data/src/json_structs.txt and should be usable by both pandas and tinyDB. 
 
 ## Development Environment
 
