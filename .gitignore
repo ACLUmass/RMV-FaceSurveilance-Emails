@@ -9,9 +9,11 @@
 
 # aaron's python3 environment
 env
+nlpAI/__pycache__
 
 # aarons sandbox
 ab_sandbox
+ext_doc
 
 # until I hear otherwise, I don't want to store RMV source files in a repo
 data/src/*.pdf
