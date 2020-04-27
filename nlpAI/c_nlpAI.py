@@ -1,5 +1,9 @@
 #!/usr/bin/python3
 #https://sukhbinder.wordpress.com/2014/12/25/an-example-of-model-view-controller-design-pattern-with-tkinter-python/
+
+#usage> python c_nlpAI.py srcFileNm.json, dstFileNm.json > dbg.txt
+#srcFileNm = file containing all the emails to train and test
+#dstFileNm = write the results of training and testing if sys.arv[2] exists. Overwrites srcFileNm if same.
 import sys
 import statsLib as stats
 import v_nlpAI as view
@@ -23,18 +27,22 @@ class ctl():
 
   def nextCback(self):
     if self.mode == "Read":
-      (mailId,email) = self.m.getReadMail(True)
-    else:
-      mailId,email = self.m.getNextTrain(self.hypo)
+      (mailId,email) = self.m.getReadMail(True) #forward read next email
+    elif self.mode == "Search":
+      (mailId,email) = self.m.getSearchMail(True,self.hypo) #forward search next AI email that matches hypo
+    else:  #Train mode
+      mailId,email = self.m.getNextTrain(self.hypo) #get next email to train
     self.v.trainedLbl.setVal(self.m.trainCt)
     self.v.trueLbl.setVal(self.m.trainTrue)
     self.v.nextVback(mailId,email) #view part of callback is here
 
   def prevCback(self):
     if self.mode == "Read":
-      (mailId,email) = self.m.getReadMail(False)
-    else:
-      mailId,email,self.hypo = self.m.getPrevTrain()
+      (mailId,email) = self.m.getReadMail(False) #backward read next email
+    elif self.mode == "Search":
+      (mailId,email) = self.m.getSearchMail(False,self.hypo) #backward read next AI email that matches hypo
+    else: #Train mode
+      mailId,email,self.hypo = self.m.getPrevTrain() #get lst trained email
     self.v.hypoVback(self.hypo)
     self.v.nextVback(mailId,email) #view part of callback is here
     return
@@ -60,7 +68,6 @@ class ctl():
     conf = self.v.conf.getVal()  #get the confidence value
     sz = stats.samSz(int(conf)/100.0,0.50,self.m.mailCt)
     self.v.trainNeedLbl.setVal(int(sz))
-    #print('dbg0',conf)
     return
 
   def runAICback(self):
@@ -71,17 +78,20 @@ class ctl():
     self.v.modeVback(self.mode)
     self.v.setVbacks(self.hypoCback,self.nextCback,self.prevCback,self.modeCback,self.gotoCback,self.runAICback,self.confCback) #give view pointers to controller callback methods
 
-    #self.v.trainNeedLbl.setVal('76')
     self.v.trainedLbl.setVal(self.m.trainCt)
     self.v.trueLbl.setVal(self.m.trainTrue)
     self.v.mailCt.setVal(self.m.mailCt)
-    #self.v.trueClass.setVal('150')
-    #self.v.falsePos.setVal('15')
-    #self.v.falseNeg.setVal('15')
     self.v.run() #run the tkinter loop
 
 #create the view object first because it will be needed in callbacks
 v = view.view()
 m = model.model(sys.argv[1])
 c = ctl(v,m)
+try:
+  dstfileNm = sys.argv[2]
+except:
+  dstfileNm = None
 c.run()
+if dstfileNm != None: #save the results 
+  m.fileSv(dstfileNm)
+

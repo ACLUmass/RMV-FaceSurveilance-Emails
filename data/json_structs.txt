@@ -6,6 +6,8 @@
   to: string,         # "
   date: string,       # "
   cc : string,        # "
+  attach : string,    # "
+  subject : string,   # "
   body : string},     #all remaining text in the email, preserving text order
   .                   #another email record just like the one above
   .

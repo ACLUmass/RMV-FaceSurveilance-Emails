@@ -84,8 +84,8 @@ class view():
     self.hypo = Button(self.ctls, width = 5)
     self.hypo.pack(side = RIGHT)
 
-    self.E1 = Entry(self.ctls, bd = 5)
-    self.E1.pack(side = RIGHT)
+    self.hypoDsc = Entry(self.ctls, bd = 5)
+    self.hypoDsc.pack(side = RIGHT)
     self.L1 = Label(self.ctls, text = "Class")
     self.L1.pack( side = RIGHT)
 
@@ -121,6 +121,7 @@ class view():
   def getGotoId(self): #get the contents of goto Entry box
     return self.goto.get()
 
+
   #view part of all callback operations go here
   def hypoVback(self,msg):
     self.hypo.config(text = msg)
@@ -139,7 +140,4 @@ class view():
 
   def runAIVback(self,msg):
     self.runAI.config(text = msg)
-
-  def getConf(self): #get the contents of confidence Entry box
-    return self.conf.getVal()
 
