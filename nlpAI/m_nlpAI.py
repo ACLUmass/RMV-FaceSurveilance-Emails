@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import json
 import random
+import nlplibAI as ai
 
 #email states
 #AI       train       comment
@@ -52,7 +53,8 @@ class model():
     text = text + '\n' + 'subject: '
     if mail['subject'] != None:
       text = text + mail['subject']
-    text = text + '\n' + mail['body']
+    if mail['body'] != None:
+      text = text + '\n' + mail['body']
 
     return(mail['mailId'],text)
 
@@ -137,3 +139,35 @@ class model():
     mail = self.mails[self.idx]
     mailId,email =  self.formText(mail) #found it!
     return(mailId,email)
+
+  def runAI(self):
+    rawMail = []  #byte form of each email
+    allBows = []  #byte representaton of all emails
+
+    for i in range(self.mailCt): #create email list
+      mail = self.mails[i]
+      mailId,email =  self.formText(mail) #convert to byte form
+      tmp = email.encode('UTF-8')
+      rawMail.append(tmp)
+    allBows = ai.mkBow(rawMail)  #turn raw mail into bag of words
+
+    trainBows = [] #byte representaton of training set
+    trainHypos = []  #training hypos for training set. 1=true, 0=false
+    trainPtrs = []   #pointer for training set into test set
+    for i in range(self.mailCt): #create training sets
+      mail = self.mails[i]
+      if 'train' in mail.keys(): #copy the training set
+        trainBows.append(allBows[i])
+        trainPtrs.append(i)
+        if mail['train'] == 'True':
+          trainHypos.append(1)
+        else:
+          trainHypos.append(0)
+
+    print('dbg0')
+    allHypos = ai.rfc(trainBows,allBows,trainHypos)
+    #allHypos = ai.svm(trainBows,allBows,trainHypos)
+    #allHypos = ai.nvBayes(trainBows,allBows,trainHypos)
+    print('dbg1')
+    print(trainHypos,trainPtrs,allHypos)
+      
