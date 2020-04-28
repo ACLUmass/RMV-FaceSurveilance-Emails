@@ -71,6 +71,7 @@ class ctl():
     return
 
   def runAICback(self):
+    self.m.runAI()
     return
 
   def run(self):
