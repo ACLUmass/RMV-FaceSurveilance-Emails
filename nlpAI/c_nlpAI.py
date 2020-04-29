@@ -27,7 +27,9 @@ class ctl():
 
   def nextCback(self):
     if self.mode == "Read":
-      (mailId,email) = self.m.getReadMail(True) #forward read next email
+      (mailId,email,aiHypo) = self.m.getReadMail(True) #forward read next email
+      self.hypo = aiHypo
+      self.v.hypoVback(self.hypo)
     elif self.mode == "Search":
       (mailId,email) = self.m.getSearchMail(True,self.hypo) #forward search next AI email that matches hypo
     else:  #Train mode
@@ -38,7 +40,9 @@ class ctl():
 
   def prevCback(self):
     if self.mode == "Read":
-      (mailId,email) = self.m.getReadMail(False) #backward read next email
+      (mailId,email,aiHypo) = self.m.getReadMail(False) #backward read next email
+      self.hypo = aiHypo
+      self.v.hypoVback(self.hypo)
     elif self.mode == "Search":
       (mailId,email) = self.m.getSearchMail(False,self.hypo) #backward read next AI email that matches hypo
     else: #Train mode
@@ -80,6 +84,9 @@ class ctl():
 
   def runAICback(self):
     self.m.runAI()
+    self.v.trueClass.setVal(self.m.aiTrue)
+    self.v.falsePos.setVal(self.m.falsePos)
+    self.v.falseNeg.setVal(self.m.falseNeg)
     return
 
   def run(self):

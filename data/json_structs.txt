@@ -1,6 +1,8 @@
 #json structure of email database
 [                     #email list containing email records of the following form
   {mailNo : integer,  #sequential from 0 thru all 10k+ emails, good for debugging
+  train: string,      #human analysis of hypothosis True/False
+  ai: string,         #ai analysis of hypothosis True/False
   mailId : string,    #file_page_no - for easily locating an email in pds
   from : string,      #exactly as it appears in pdf. There's lots a variation
   to: string,         # "
