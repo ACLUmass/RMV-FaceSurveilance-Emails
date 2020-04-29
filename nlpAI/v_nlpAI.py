@@ -28,6 +28,8 @@ class lblEntry():
   def getVal(self):
     return self.entry.get()
 
+  def setVal(self,val):
+    self.entry.insert(END,val)
 
 class view():
   def __init__(self): #setup everything without controller callbacks
@@ -45,14 +47,15 @@ class view():
     self.runAI = Button(self.stats, text = "runAI",width=10,height=2,bg='green')
     self.runAI.pack(side = TOP)
     self.conf = lblEntry(self.stats, 'confidence %')
+    self.conf.setVal(75)
     self.trainResult = lblVal(self.stats, 'train result')
     self.trainNeedLbl = lblVal(self.stats, 'train needed')
     self.trainedLbl = lblVal(self.stats, 'trained')
     self.trueLbl = lblVal(self.stats, 'trained true')
-    self.mailCt = lblVal(self.stats, 'mail count')
     self.trueClass = lblVal(self.stats, 'AI true')
     self.falsePos = lblVal(self.stats, 'bad AI true')
     self.falseNeg = lblVal(self.stats, 'bad AI false')
+    self.mailCt = lblEntry(self.stats, 'mail count')
 
 
 ################# Email Reader Subframe ################################
@@ -109,7 +112,7 @@ class view():
     self.text.config(state=DISABLED)
 
   #pointers to controller parts of callback operations are set her
-  def setVbacks(self,hypoCback, nextCback,prevCback,modeCback,gotoCback,runAICback,confCback):
+  def setVbacks(self,hypoCback, nextCback,prevCback,modeCback,gotoCback,runAICback,confCback,mailCtCback):
     self.hypo.config(command = hypoCback)
     self.next.config(command = nextCback)
     self.prev.config(command = prevCback)
@@ -117,6 +120,7 @@ class view():
     self.goto.bind('<Return>', gotoCback)
     self.runAI.config(command = runAICback)
     self.conf.entry.bind('<Return>', confCback)
+    self.mailCt.entry.bind('<Return>', mailCtCback)
 
   def getGotoId(self): #get the contents of goto Entry box
     return self.goto.get()

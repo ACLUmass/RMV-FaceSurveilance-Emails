@@ -70,6 +70,14 @@ class ctl():
     self.v.trainNeedLbl.setVal(int(sz))
     return
 
+
+  def mailCtCback(self,dummy): #dummy is the return character that we don't need
+    conf = self.v.conf.getVal()  #get the confidence value
+    self.m.mailCt = int(self.v.mailCt.getVal())  #get the size of the mail sample to use
+    sz = stats.samSz(int(conf)/100.0,0.50,self.m.mailCt) #and recalculate the needed training size
+    self.v.trainNeedLbl.setVal(int(sz))
+    return
+
   def runAICback(self):
     self.m.runAI()
     return
@@ -77,7 +85,7 @@ class ctl():
   def run(self):
     self.v.hypoVback(self.hypo)
     self.v.modeVback(self.mode)
-    self.v.setVbacks(self.hypoCback,self.nextCback,self.prevCback,self.modeCback,self.gotoCback,self.runAICback,self.confCback) #give view pointers to controller callback methods
+    self.v.setVbacks(self.hypoCback,self.nextCback,self.prevCback,self.modeCback,self.gotoCback,self.runAICback,self.confCback,self.mailCtCback) #give view pointers to controller callback methods
 
     self.v.trainedLbl.setVal(self.m.trainCt)
     self.v.trueLbl.setVal(self.m.trainTrue)
