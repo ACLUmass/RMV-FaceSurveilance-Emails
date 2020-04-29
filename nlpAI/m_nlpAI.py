@@ -23,6 +23,9 @@ class model():
     self.mailCt = len(self.mails)
     self.trainCt = 0
     self.trainTrue = 0
+    self.aiTrue = 0
+    self.falsePos = None
+    self.falseNeg = None
     self.idx = None
     self.trains = [] #in train mode mailIdx moves forward randomly and backward by popping off this list
     for i in range(self.mailCt):
@@ -106,7 +109,12 @@ class model():
       return('none','out of bounds')
     else: #get the email
       mail = self.mails[self.idx]
-      return(self.formText(mail))
+      tmp = self.formText(mail)
+      if 'ai' in mail.keys():
+        aiHypo = mail['ai']
+      else:
+        aiHypo = 'None'
+      return(tmp[0],tmp[1],aiHypo)
 
 
   #get next or previous email that matches AI hypo
@@ -172,10 +180,29 @@ class model():
     #  print('-----')
     #  print(x)
     allHypos = ai.rfc(trainSets,allSets,trainHypos)
+    self.aiTrue = 0
+    for i in range(self.mailCt): #create training sets
+      if allHypos[i] == 1:
+        self.mails[i]['ai'] = 'True'
+        self.aiTrue += 1
+      else:
+        self.mails[i]['ai'] = 'False'
+
+    self.falsePos = 0
+    self.falseNeg = 0
+    for i in range(self.trainCt):
+      ptr = trainPtrs[i] 
+      aiHypo = self.mails[ptr]['ai']
+      huHypo = self.mails[ptr]['train']
+      if aiHypo != huHypo: #by definition the human is always right 
+        if aiHypo == 'True':
+          self.falsePos += 1
+        else:
+          self.falseNeg += 1
     #allHypos = ai.svm(trainBows,allBows,trainHypos)
     #allHypos = ai.nvBayes(trainBows,allBows,trainHypos)
     #print('dbg1')
-    print(trainHypos)
-    print(trainPtrs)
-    print(allHypos)
+    #print(trainHypos)
+    #print(trainPtrs)
+    #print(allHypos)
       
