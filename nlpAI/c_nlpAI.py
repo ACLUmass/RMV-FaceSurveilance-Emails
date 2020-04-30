@@ -13,27 +13,36 @@ class ctl():
   def __init__(self,view,model):
     self.v = view
     self.m = model
-    self.hypo = "True"
+    self.aiHypo = "None"
+    self.huHypo = "True"
     self.mode = "Train"
 
   #create all the controller methods that the view object uses as callbacks
-  def hypoCback(self):
+  def huHypoCback(self):
   #put controller part of callback response here.......
-    if self.hypo == "True":
-      self.hypo = "False"
+    if self.huHypo == "True":
+      self.huHypo = "False"
     else:
-      self.hypo = "True"
-    self.v.hypoVback(self.hypo) #view part of callback is here
+      self.huHypo = "True"
+    self.v.huHypoVback(self.huHypo) #view part of callback is here
+
+  def aiHypoCback(self):
+  #put controller part of callback response here.......
+    if self.aiHypo == "True":
+      self.aiHypo = "False"
+    else:
+      self.aiHypo = "True"
+    self.v.aiHypoVback(self.aiHypo) #view part of callback is here
 
   def nextCback(self):
     if self.mode == "Read":
       (mailId,email,aiHypo) = self.m.getReadMail(True) #forward read next email
-      self.hypo = aiHypo
-      self.v.hypoVback(self.hypo)
+      self.aiHypo = aiHypo
+      self.v.aiHypo.setVal(self.aiHypo)
     elif self.mode == "Search":
-      (mailId,email) = self.m.getSearchMail(True,self.hypo) #forward search next AI email that matches hypo
+      (mailId,email,aiHypo) = self.m.getSearchMail(True,self.aiHypo) #forward search next AI email that matches hypo
     else:  #Train mode
-      mailId,email = self.m.getNextTrain(self.hypo) #get next email to train
+      mailId,email = self.m.getNextTrain(self.huHypo) #get next email to train
     self.v.trainedLbl.setVal(self.m.trainCt)
     self.v.trueLbl.setVal(self.m.trainTrue)
     self.v.nextVback(mailId,email) #view part of callback is here
@@ -41,13 +50,13 @@ class ctl():
   def prevCback(self):
     if self.mode == "Read":
       (mailId,email,aiHypo) = self.m.getReadMail(False) #backward read next email
-      self.hypo = aiHypo
-      self.v.hypoVback(self.hypo)
+      self.aiHypo = aiHypo
+      self.v.huHypoVback(self.huHypo)
     elif self.mode == "Search":
-      (mailId,email) = self.m.getSearchMail(False,self.hypo) #backward read next AI email that matches hypo
+      (mailId,email,aiHypo) = self.m.getSearchMail(False,self.aiHypo) #backward read next AI email that matches hypo
     else: #Train mode
-      mailId,email,self.hypo = self.m.getPrevTrain() #get lst trained email
-    self.v.hypoVback(self.hypo)
+      mailId,email,self.huHypo = self.m.getPrevTrain() #get lst trained email
+    self.v.huHypoVback(self.huHypo)
     self.v.nextVback(mailId,email) #view part of callback is here
     return
 
@@ -90,9 +99,10 @@ class ctl():
     return
 
   def run(self):
-    self.v.hypoVback(self.hypo)
+    self.v.huHypoVback(self.huHypo)
+    self.v.aiHypoVback(self.aiHypo)
     self.v.modeVback(self.mode)
-    self.v.setVbacks(self.hypoCback,self.nextCback,self.prevCback,self.modeCback,self.gotoCback,self.runAICback,self.confCback,self.mailCtCback) #give view pointers to controller callback methods
+    self.v.setVbacks(self.huHypoCback,self.aiHypoCback,self.nextCback,self.prevCback,self.modeCback,self.gotoCback,self.runAICback,self.confCback,self.mailCtCback) #give view pointers to controller callback methods
 
     self.v.trainedLbl.setVal(self.m.trainCt)
     self.v.trueLbl.setVal(self.m.trainTrue)
