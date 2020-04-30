@@ -106,7 +106,7 @@ class model():
         self.idx -= 1
 
     if self.idx == self.mailCt or self.idx == -1: #signal that index is out of bounds
-      return('none','out of bounds')
+      return('none','out of bounds','')
     else: #get the email
       mail = self.mails[self.idx]
       tmp = self.formText(mail)
@@ -119,22 +119,12 @@ class model():
 
   #get next or previous email that matches AI hypo
   def getSearchMail(self,fwd,hypo):
-    if fwd == True: #move the index forward.
-      if self.idx == None:
-        self.idx = 0
-      elif self.idx < self.mailCt:
-        self.idx += 1
-    else: #move index backward
-      if self.idx == None:
-        self.idx = self.mailCt - 1
-      elif self.idx > -1:
-        self.idx -= 1
+    while True:
+      mailId,email,aiHypo = self.getReadMail(fwd)
+      if mailId == 'none' or aiHypo == hypo:
+        break
+    return(mailId,email,aiHypo)
 
-    if self.idx == self.mailCt or self.idx == -1: #signal that index is out of bounds
-      return('none','out of bounds')
-    else: #get the email
-      mail = self.mails[self.idx]
-      return(self.formText(mail))
 
   #goto a mailId
   def getGotoMail(self,gotoId):

@@ -5,12 +5,11 @@ from tkinter import *
 from tkinter import messagebox
 
 class lblVal():
-  def __init__(self,root,label):
+  def __init__(self,root,label,wd):
     #self.lblFr = LabelFrame(root, text = label, labelanchor = 'w')
     self.lblFr = LabelFrame(root, text = label)
     self.lblFr.pack(side=TOP)
-    #self.entry = Label(self.lblFr, text = val, width=10)
-    self.val = Label(self.lblFr,  width=10)
+    self.val = Label(self.lblFr,  width=wd)
     self.val.pack(side = TOP)
 
   def setVal(self,val):
@@ -18,11 +17,11 @@ class lblVal():
 
 
 class lblEntry():
-  def __init__(self,root,label):
+  def __init__(self,root,label,wd):
     #self.lblFr = LabelFrame(root, text = label, labelanchor = 'w')
     self.lblFr = LabelFrame(root, text = label)
-    self.lblFr.pack(side=TOP)
-    self.entry = Entry(self.lblFr, width=10, bd=5)
+    #self.lblFr.pack(side=TOP)
+    self.entry = Entry(self.lblFr, width=wd, bd=5)
     self.entry.pack(side = TOP)
 
   def getVal(self):
@@ -30,6 +29,20 @@ class lblEntry():
 
   def setVal(self,val):
     self.entry.insert(END,val)
+
+
+class lblButton():
+  def __init__(self,root,label,wd):
+    self.lblFr = LabelFrame(root, text = label)
+    self.lblFr.pack(side=RIGHT)
+    self.button = Button(self.lblFr, width = wd)
+    self.button.pack(side = RIGHT)
+
+  def getVal(self):
+    return self.button.get()
+
+  def setVal(self,val):
+    self.button.config(text = val)
 
 class view():
   def __init__(self): #setup everything without controller callbacks
@@ -46,16 +59,18 @@ class view():
     self.statsPad.pack(side = TOP)
     self.runAI = Button(self.stats, text = "runAI",width=10,height=2,bg='green')
     self.runAI.pack(side = TOP)
-    self.conf = lblEntry(self.stats, 'confidence %')
+    self.conf = lblEntry(self.stats, 'confidence %',10)
+    self.conf.lblFr.pack(side=TOP)
     self.conf.setVal(75)
-    self.trainResult = lblVal(self.stats, 'train result')
-    self.trainNeedLbl = lblVal(self.stats, 'train needed')
-    self.trainedLbl = lblVal(self.stats, 'trained')
-    self.trueLbl = lblVal(self.stats, 'trained true')
-    self.trueClass = lblVal(self.stats, 'AI true')
-    self.falsePos = lblVal(self.stats, 'bad AI true')
-    self.falseNeg = lblVal(self.stats, 'bad AI false')
-    self.mailCt = lblEntry(self.stats, 'mail count')
+    self.trainResult = lblVal(self.stats, 'train result',10)
+    self.trainNeedLbl = lblVal(self.stats, 'train needed',10)
+    self.trainedLbl = lblVal(self.stats, 'trained',10)
+    self.trueLbl = lblVal(self.stats, 'trained true',10)
+    self.trueClass = lblVal(self.stats, 'AI true',10)
+    self.falsePos = lblVal(self.stats, 'bad AI true',10)
+    self.falseNeg = lblVal(self.stats, 'bad AI false',10)
+    self.mailCt = lblEntry(self.stats, 'mail count',10)
+    self.mailCt.lblFr.pack(side=TOP)
 
 
 ################# Email Reader Subframe ################################
@@ -84,8 +99,12 @@ class view():
     self.next = Button(self.ctls, text = "Next")
     self.next.pack(side = RIGHT)
 
-    self.hypo = Button(self.ctls, width = 5)
-    self.hypo.pack(side = RIGHT)
+    #self.hypo = Button(self.ctls, width = 5)
+    self.huHypo = lblButton(self.ctls, 'human',6)
+    self.huHypo.lblFr.pack(side=RIGHT)
+    self.aiHypo = lblButton(self.ctls, 'ai',6)
+    self.aiHypo.lblFr.pack(side=RIGHT)
+    #self.hypo.pack(side = RIGHT)
 
     self.hypoDsc = Entry(self.ctls, bd = 5)
     self.hypoDsc.pack(side = RIGHT)
@@ -112,8 +131,10 @@ class view():
     self.text.config(state=DISABLED)
 
   #pointers to controller parts of callback operations are set her
-  def setVbacks(self,hypoCback, nextCback,prevCback,modeCback,gotoCback,runAICback,confCback,mailCtCback):
-    self.hypo.config(command = hypoCback)
+  def setVbacks(self,huHypoCback,aiHypoCback, nextCback,prevCback,modeCback,gotoCback,runAICback,confCback,mailCtCback):
+    #self.hypo.config(command = hypoCback)
+    self.huHypo.button.config(command = huHypoCback)
+    self.aiHypo.button.config(command = aiHypoCback)
     self.next.config(command = nextCback)
     self.prev.config(command = prevCback)
     self.mode.config(command = modeCback)
@@ -127,8 +148,13 @@ class view():
 
 
   #view part of all callback operations go here
-  def hypoVback(self,msg):
-    self.hypo.config(text = msg)
+  def huHypoVback(self,msg):
+    #self.hypo.config(text = msg)
+    self.huHypo.setVal(msg)
+
+  def aiHypoVback(self,msg):
+    #self.hypo.config(text = msg)
+    self.aiHypo.setVal(msg)
 
   def nextVback(self,mailId,email):
     self.ldEmail(mailId,email)
