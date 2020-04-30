@@ -13,63 +13,37 @@ class ctl():
   def __init__(self,view,model):
     self.v = view
     self.m = model
-    self.aiHypo = "None"
-    self.huHypo = "True"
-    self.mode = "Train"
 
   #create all the controller methods that the view object uses as callbacks
-  def huHypoCback(self):
-  #put controller part of callback response here.......
-    if self.huHypo == "True":
-      self.huHypo = "False"
-    else:
-      self.huHypo = "True"
-    self.v.huHypoVback(self.huHypo) #view part of callback is here
-
-  def aiHypoCback(self):
-  #put controller part of callback response here.......
-    if self.aiHypo == "True":
-      self.aiHypo = "False"
-    else:
-      self.aiHypo = "True"
-    self.v.aiHypoVback(self.aiHypo) #view part of callback is here
-
-  def nextCback(self):
-    if self.v.mode['text'] == "Read":
+  def nextCback(self): #move forward in emails
+    if self.v.mode['text'] == "Read": #get next in email list
       (mailId,email,aiHypo,huHypo) = self.m.getReadMail(True) #forward read next email
-      #self.aiHypo = aiHypo
       self.v.aiHypo.setVal(aiHypo)
       self.v.huHypo.setVal(huHypo)
-    elif self.mode == "Search":
-      (mailId,email,aiHypo) = self.m.getSearchMail(True,self.aiHypo) #forward search next AI email that matches hypo
-    else:  #Train mode
-      mailId,email = self.m.getNextTrain(self.huHypo) #get next email to train
-    self.v.trainedLbl.setVal(self.m.trainCt)
-    self.v.trueLbl.setVal(self.m.trainTrue)
+    elif self.v.mode['text'] == "Search": #search for next that matches aiHypo
+      (mailId,email,huHypo) = self.m.getSearchMail(True,self.v.aiHypo.getVal()) #forward search next AI email that matches hypo
+      self.v.huHypo.setVal(huHypo)
+    else:  #Train mode - train current email and fetch random untrained emails
+      trainCt,trainTrue = self.m.chgCurTrain(self.v.huHypo.getVal()) #train current email
+      self.v.trainedLbl.setVal(trainCt) #set training stats
+      self.v.trueLbl.setVal(trainTrue)
+      mailId,email,huHypo = self.m.getNextTrain() #get next email to train
+      self.v.huHypo.setVal(huHypo)
     self.v.nextVback(mailId,email) #view part of callback is here
 
-  def prevCback(self):
+  def prevCback(self): #move backward in emails
     if self.v.mode['text'] == "Read":
       (mailId,email,aiHypo,huHypo) = self.m.getReadMail(False) #backward read next email
       self.v.aiHypo.setVal(aiHypo)
       self.v.huHypo.setVal(huHypo)
-    elif self.mode == "Search":
-      (mailId,email,aiHypo) = self.m.getSearchMail(False,self.aiHypo) #backward read next AI email that matches hypo
+    elif self.v.mode['text'] == "Search":
+      (mailId,email,huHypo) = self.m.getSearchMail(False,self.v.aiHypo.getVal()) #forward search next AI email that matches hypo
+      self.v.huHypo.setVal(huHypo)
     else: #Train mode
-      mailId,email,self.huHypo = self.m.getPrevTrain() #get lst trained email
-    #self.v.huHypoVback(self.huHypo)
+      mailId,email,huHypo = self.m.getPrevTrain() #get last trained email
+    self.v.huHypo.setVal(huHypo)
     self.v.nextVback(mailId,email) #view part of callback is here
     return
-
-  def modeCback(self):
-  #put controller part of callback response here.......
-    if self.mode == "Train":
-      self.mode = "Search"
-    elif self.mode == "Search":
-      self.mode = "Read"
-    else:
-      self.mode = "Train"
-    self.v.modeVback(self.mode) #view part of callback is here
 
   def gotoCback(self,dummy): #dummy is the return character that we don't need
     gotoId = self.v.getGotoId()  #get the mailID from the entry box
@@ -100,14 +74,16 @@ class ctl():
     return
 
   def run(self):
-    #self.v.huHypoVback(self.huHypo)
-    #self.v.aiHypoVback(self.aiHypo)
-    #self.v.modeVback(self.mode)
     self.v.setVbacks(self.nextCback,self.prevCback,self.gotoCback,self.runAICback,self.confCback,self.mailCtCback) #give view pointers to controller callback methods
 
-    self.v.trainedLbl.setVal(self.m.trainCt)
+    self.v.trainedLbl.setVal(self.m.trainCt) #set existing stats
     self.v.trueLbl.setVal(self.m.trainTrue)
     self.v.mailCt.setVal(self.m.mailCt)
+
+    (mailId,email,aiHypo,huHypo) = self.m.getReadMail(True) #point to first email to read
+    self.v.aiHypo.setVal(aiHypo)
+    self.v.huHypo.setVal(huHypo)
+    self.v.nextVback(mailId,email) #view part of callback is here
     self.v.run() #run the tkinter loop
 
 #create the view object first because it will be needed in callbacks
