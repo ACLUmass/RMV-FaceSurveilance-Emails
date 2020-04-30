@@ -39,7 +39,8 @@ class lblButton():
     self.button.pack(side = RIGHT)
 
   def getVal(self):
-    return self.button.get()
+    #return self.button.get()
+    return self.button['text']
 
   def setVal(self,val):
     self.button.config(text = val)
@@ -91,8 +92,12 @@ class view():
     self.ctls.pack(side=TOP,fill=X)
 
     self.ctlsPad = Frame(self.ctls,width=5)
-    self.ctlsPad.pack(side = TOP)
+    #self.ctlsPad.pack(side = TOP)
     self.ctlsPad.pack(side = RIGHT)
+
+    self.mode = Button(self.ctls, text = 'Read', width=6)
+    self.mode.pack(side = RIGHT)
+
     self.prev = Button(self.ctls, text = "Prev")
     self.prev.pack(side = RIGHT)
 
@@ -102,6 +107,7 @@ class view():
     #self.hypo = Button(self.ctls, width = 5)
     self.huHypo = lblButton(self.ctls, 'human',6)
     self.huHypo.lblFr.pack(side=RIGHT)
+
     self.aiHypo = lblButton(self.ctls, 'ai',6)
     self.aiHypo.lblFr.pack(side=RIGHT)
     #self.hypo.pack(side = RIGHT)
@@ -110,9 +116,6 @@ class view():
     self.hypoDsc.pack(side = RIGHT)
     self.L1 = Label(self.ctls, text = "Class")
     self.L1.pack( side = RIGHT)
-
-    self.mode = Button(self.ctls, width=6)
-    self.mode.pack(side = RIGHT)
 
     self.L2 = Label(self.ctls, text = "Goto")
     self.L2.pack( side = LEFT)
@@ -130,14 +133,39 @@ class view():
     self.text.insert(INSERT, email)
     self.text.config(state=DISABLED)
 
+  def modeVback(self):
+    tmp = self.mode['text']
+    if tmp == 'Read':
+      self.mode.config(text = 'Search')
+    elif tmp == 'Search':
+      self.mode.config(text = 'Train')
+    else:
+      self.mode.config(text = 'Read')
+
+  def huHypoVback(self):
+    tmp = self.huHypo.getVal()
+    if tmp == 'True':
+      self.huHypo.setVal('False')
+    else:
+      self.huHypo.setVal('True')
+
+  def aiHypoVback(self):
+    tmp = self.aiHypo.getVal()
+    if tmp == 'True':
+      self.aiHypo.setVal('False')
+    else:
+      self.aiHypo.setVal('True')
+
+
+
   #pointers to controller parts of callback operations are set her
-  def setVbacks(self,huHypoCback,aiHypoCback, nextCback,prevCback,modeCback,gotoCback,runAICback,confCback,mailCtCback):
-    #self.hypo.config(command = hypoCback)
-    self.huHypo.button.config(command = huHypoCback)
-    self.aiHypo.button.config(command = aiHypoCback)
+  def setVbacks(self,nextCback,prevCback,gotoCback,runAICback,confCback,mailCtCback):
+    self.mode.config(command = self.modeVback)
+    self.huHypo.button.config(command = self.huHypoVback)
+    self.aiHypo.button.config(command = self.aiHypoVback)
+
     self.next.config(command = nextCback)
     self.prev.config(command = prevCback)
-    self.mode.config(command = modeCback)
     self.goto.bind('<Return>', gotoCback)
     self.runAI.config(command = runAICback)
     self.conf.entry.bind('<Return>', confCback)
@@ -146,25 +174,11 @@ class view():
   def getGotoId(self): #get the contents of goto Entry box
     return self.goto.get()
 
-
-  #view part of all callback operations go here
-  def huHypoVback(self,msg):
-    #self.hypo.config(text = msg)
-    self.huHypo.setVal(msg)
-
-  def aiHypoVback(self,msg):
-    #self.hypo.config(text = msg)
-    self.aiHypo.setVal(msg)
-
   def nextVback(self,mailId,email):
     self.ldEmail(mailId,email)
 
   def prevVback(self,mailId,email):
     self.ldEmail(mailId,email)
-
-  def modeVback(self,msg):
-    self.mode.config(text = msg)
-
   def gotoVback(self,mailId,email):
     self.ldEmail(mailId,email)
 

@@ -35,10 +35,11 @@ class ctl():
     self.v.aiHypoVback(self.aiHypo) #view part of callback is here
 
   def nextCback(self):
-    if self.mode == "Read":
-      (mailId,email,aiHypo) = self.m.getReadMail(True) #forward read next email
-      self.aiHypo = aiHypo
-      self.v.aiHypo.setVal(self.aiHypo)
+    if self.v.mode['text'] == "Read":
+      (mailId,email,aiHypo,huHypo) = self.m.getReadMail(True) #forward read next email
+      #self.aiHypo = aiHypo
+      self.v.aiHypo.setVal(aiHypo)
+      self.v.huHypo.setVal(huHypo)
     elif self.mode == "Search":
       (mailId,email,aiHypo) = self.m.getSearchMail(True,self.aiHypo) #forward search next AI email that matches hypo
     else:  #Train mode
@@ -48,15 +49,15 @@ class ctl():
     self.v.nextVback(mailId,email) #view part of callback is here
 
   def prevCback(self):
-    if self.mode == "Read":
-      (mailId,email,aiHypo) = self.m.getReadMail(False) #backward read next email
-      self.aiHypo = aiHypo
-      self.v.huHypoVback(self.huHypo)
+    if self.v.mode['text'] == "Read":
+      (mailId,email,aiHypo,huHypo) = self.m.getReadMail(False) #backward read next email
+      self.v.aiHypo.setVal(aiHypo)
+      self.v.huHypo.setVal(huHypo)
     elif self.mode == "Search":
       (mailId,email,aiHypo) = self.m.getSearchMail(False,self.aiHypo) #backward read next AI email that matches hypo
     else: #Train mode
       mailId,email,self.huHypo = self.m.getPrevTrain() #get lst trained email
-    self.v.huHypoVback(self.huHypo)
+    #self.v.huHypoVback(self.huHypo)
     self.v.nextVback(mailId,email) #view part of callback is here
     return
 
@@ -99,10 +100,10 @@ class ctl():
     return
 
   def run(self):
-    self.v.huHypoVback(self.huHypo)
-    self.v.aiHypoVback(self.aiHypo)
-    self.v.modeVback(self.mode)
-    self.v.setVbacks(self.huHypoCback,self.aiHypoCback,self.nextCback,self.prevCback,self.modeCback,self.gotoCback,self.runAICback,self.confCback,self.mailCtCback) #give view pointers to controller callback methods
+    #self.v.huHypoVback(self.huHypo)
+    #self.v.aiHypoVback(self.aiHypo)
+    #self.v.modeVback(self.mode)
+    self.v.setVbacks(self.nextCback,self.prevCback,self.gotoCback,self.runAICback,self.confCback,self.mailCtCback) #give view pointers to controller callback methods
 
     self.v.trainedLbl.setVal(self.m.trainCt)
     self.v.trueLbl.setVal(self.m.trainTrue)
