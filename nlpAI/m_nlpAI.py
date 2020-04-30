@@ -20,13 +20,13 @@ class model():
     inf = open(fileNm, 'r')
     r = inf.read()  #read in all the bytes into one string
     self.mails = json.loads(r)
+    self.idx = None 
     self.mailCt = len(self.mails)
     self.trainCt = 0
     self.trainTrue = 0
     self.aiTrue = 0
     self.falsePos = None
     self.falseNeg = None
-    self.idx = None
     self.trains = [] #in train mode mailIdx moves forward randomly and backward by popping off this list
     for i in range(self.mailCt):
       if 'train' in self.mails[i]:
@@ -61,25 +61,35 @@ class model():
 
     return(mail['mailId'],text)
 
+  #change current training of current email its training stats
+  def chgCurTrain(self,hypo):
+    if not 'train' in self.mails[self.idx].keys(): #has not been trained yet
+      self.trainCt += 1
+      if hypo == 'True':
+        self.trainTrue += 1
+    else:  #previously trained
+      if hypo != self.mails[self.idx]['train']: #changing training
+        if hypo == 'True': #false to true
+          self.trainTrue += 1
+        else: #true to false
+          self.trainTrue -= 1
+    self.mails[self.idx]['train'] = hypo
+    return(self.trainCt, self.trainTrue)
+          
+
   #add training to current email and fetch a new random one to train
-  def getNextTrain(self,hypo):
+  def getNextTrain(self):
     if self.trainCt == self.mailCt: #nothing left to train
       return('none','all trained')
+    self.trains.append(self.idx) #put current idx on list for going in reverse
     while True: #find a mail that has not been trained already
-      idx = random.randint(0,self.mailCt - 1) 
-      if not 'train' in  self.mails[idx].keys():
+      self.idx = random.randint(0,self.mailCt - 1) 
+      if not 'train' in  self.mails[self.idx].keys():
         break
-    if self.idx != None:
-      self.mails[self.idx]['train'] = hypo
-      self.trainCt += 1
-      if hypo == "True":
-        self.trainTrue += 1
-      self.trains.append(self.idx) #put idx on list for going in reverse
-    self.idx = idx
 
     mail = self.mails[self.idx]
     mailId,email =  self.formText(mail)
-    return(mailId,email)
+    return(mailId,email,'None')
 
   #update training to current email and fetch previously trained email plus its training
   def getPrevTrain(self):
@@ -113,21 +123,21 @@ class model():
       if 'ai' in mail.keys():
         aiHypo = mail['ai']
       else:
-        aiHypo = ''
+        aiHypo = 'None'
       if 'train' in mail.keys():
         huHypo = mail['train']
       else:
-        huHypo = ''
+        huHypo = 'None'
       return(tmp[0],tmp[1],aiHypo,huHypo)
 
 
   #get next or previous email that matches AI hypo
   def getSearchMail(self,fwd,hypo):
     while True:
-      mailId,email,aiHypo = self.getReadMail(fwd)
+      mailId,email,aiHypo,huHypo = self.getReadMail(fwd)
       if mailId == 'none' or aiHypo == hypo:
         break
-    return(mailId,email,aiHypo)
+    return(mailId,email,huHypo)
 
 
   #goto a mailId
@@ -169,10 +179,6 @@ class model():
         else:
           trainHypos.append(0)
 
-    #print('dbg0')
-    #for x in allBows:
-    #  print('-----')
-    #  print(x)
     allHypos = ai.rfc(trainSets,allSets,trainHypos)
     self.aiTrue = 0
     for i in range(self.mailCt): #create training sets
@@ -193,10 +199,4 @@ class model():
           self.falsePos += 1
         else:
           self.falseNeg += 1
-    #allHypos = ai.svm(trainBows,allBows,trainHypos)
-    #allHypos = ai.nvBayes(trainBows,allBows,trainHypos)
-    #print('dbg1')
-    #print(trainHypos)
-    #print(trainPtrs)
-    #print(allHypos)
       

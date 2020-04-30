@@ -95,13 +95,13 @@ class view():
     #self.ctlsPad.pack(side = TOP)
     self.ctlsPad.pack(side = RIGHT)
 
-    self.mode = Button(self.ctls, text = 'Read', width=6)
+    self.mode = Button(self.ctls, text = 'Read', width=6, height=2)
     self.mode.pack(side = RIGHT)
 
-    self.prev = Button(self.ctls, text = "Prev")
+    self.prev = Button(self.ctls, text = "Prev", height=2)
     self.prev.pack(side = RIGHT)
 
-    self.next = Button(self.ctls, text = "Next")
+    self.next = Button(self.ctls, text = "Next", height=2)
     self.next.pack(side = RIGHT)
 
     #self.hypo = Button(self.ctls, width = 5)
@@ -143,18 +143,20 @@ class view():
       self.mode.config(text = 'Read')
 
   def huHypoVback(self):
-    tmp = self.huHypo.getVal()
-    if tmp == 'True':
-      self.huHypo.setVal('False')
-    else:
-      self.huHypo.setVal('True')
+    if self.mode['text'] == 'Train': #user change allowed only in train mode
+      tmp = self.huHypo.getVal()
+      if tmp == 'True':
+        self.huHypo.setVal('False')
+      else:
+        self.huHypo.setVal('True')
 
   def aiHypoVback(self):
-    tmp = self.aiHypo.getVal()
-    if tmp == 'True':
-      self.aiHypo.setVal('False')
-    else:
-      self.aiHypo.setVal('True')
+    if self.mode['text'] == 'Search': #user change allowed because search is on aiHypo
+      tmp = self.aiHypo.getVal()
+      if tmp == 'True':
+        self.aiHypo.setVal('False')
+      else:
+        self.aiHypo.setVal('True')
 
 
 
