@@ -85,7 +85,7 @@ class model():
   def getPrevTrain(self):
     if len(self.trains) == 0: #walked all the way back
       self.idx = None
-      return('none','all the way back','None')
+      return('none','all the way back','','')
     self.idx = self.trains.pop()
 
     mail = self.mails[self.idx]
@@ -106,15 +106,19 @@ class model():
         self.idx -= 1
 
     if self.idx == self.mailCt or self.idx == -1: #signal that index is out of bounds
-      return('none','out of bounds','')
+      return('none','out of bounds','','')
     else: #get the email
       mail = self.mails[self.idx]
       tmp = self.formText(mail)
       if 'ai' in mail.keys():
         aiHypo = mail['ai']
       else:
-        aiHypo = 'None'
-      return(tmp[0],tmp[1],aiHypo)
+        aiHypo = ''
+      if 'train' in mail.keys():
+        huHypo = mail['train']
+      else:
+        huHypo = ''
+      return(tmp[0],tmp[1],aiHypo,huHypo)
 
 
   #get next or previous email that matches AI hypo
