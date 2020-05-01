@@ -44,11 +44,19 @@ class lblButton():
 
   def setVal(self,val):
     self.button.config(text = val)
+    if val == 'True':
+      self.lblFr.config(bg='#7fff7f')
+    elif val == 'False':
+      self.lblFr.config(bg='#ff7f7f')
+    else:
+      self.lblFr.config(bg='#ffffff')
+      
 
 class view():
   def __init__(self): #setup everything without controller callbacks
     #layout the frames in the top window
     self.top = Tk()
+    self.top.title('Email AI Classifier')
     self.grp = Frame(self.top) #put a group subframe for stats and email at the top of window
     self.grp.pack(side=TOP)
 
@@ -58,7 +66,7 @@ class view():
 
     self.statsPad = Frame(self.stats,height=9)
     self.statsPad.pack(side = TOP)
-    self.runAI = Button(self.stats, text = "runAI",width=10,height=2,bg='green')
+    self.runAI = Button(self.stats, text = "runAI",width=10,height=2)
     self.runAI.pack(side = TOP)
     self.conf = lblEntry(self.stats, 'confidence %',10)
     self.conf.lblFr.pack(side=TOP)
@@ -147,6 +155,8 @@ class view():
       tmp = self.huHypo.getVal()
       if tmp == 'True':
         self.huHypo.setVal('False')
+      #`if tmp == 'False':
+      #`  self.huHypo.setVal('None')
       else:
         self.huHypo.setVal('True')
 
@@ -155,6 +165,8 @@ class view():
       tmp = self.aiHypo.getVal()
       if tmp == 'True':
         self.aiHypo.setVal('False')
+      #if tmp == 'False':
+      #  self.aiHypo.setVal('None')
       else:
         self.aiHypo.setVal('True')
 
