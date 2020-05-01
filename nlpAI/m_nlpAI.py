@@ -33,6 +33,8 @@ class model():
         self.trainCt += 1
         if self.mails[i]['train'] == 'True':
           self.trainTrue += 1
+      #else:
+      #  self.mails[i]['train'] = 'None'
 
   def fileSv(self,fileNm): #save the results
     with open(fileNm, 'w') as f:
@@ -95,7 +97,7 @@ class model():
   def getPrevTrain(self):
     if len(self.trains) == 0: #walked all the way back
       self.idx = None
-      return('none','all the way back','','')
+      return('none','all the way back','')
     self.idx = self.trains.pop()
 
     mail = self.mails[self.idx]
