@@ -21,7 +21,7 @@ class ctl():
       self.v.aiHypo.setVal(aiHypo)
       self.v.huHypo.setVal(huHypo)
     elif self.v.mode['text'] == "Search": #search for next that matches aiHypo
-      (mailId,email,huHypo) = self.m.getSearchMail(True,self.v.aiHypo.getVal()) #forward search next AI email that matches hypo
+      (mailId,email,aiHypo,huHypo) = self.m.getSearchMail(True,self.v.aiHypo.getVal(),self.v.huHypo.getVal()) #forward search next AI email that matches hypo
       self.v.huHypo.setVal(huHypo)
     else:  #Train mode - train current email and fetch random untrained emails
       trainCt,trainTrue = self.m.chgCurTrain(self.v.huHypo.getVal()) #train current email
@@ -37,7 +37,7 @@ class ctl():
       self.v.aiHypo.setVal(aiHypo)
       self.v.huHypo.setVal(huHypo)
     elif self.v.mode['text'] == "Search":
-      (mailId,email,huHypo) = self.m.getSearchMail(False,self.v.aiHypo.getVal()) #forward search next AI email that matches hypo
+      (mailId,email,aiHypo,huHypo) = self.m.getSearchMail(False,self.v.aiHypo.getVal(),self.v.huHypo.getVal()) #forward search next AI email that matches hypo
       self.v.huHypo.setVal(huHypo)
     else: #Train mode
       mailId,email,huHypo = self.m.getPrevTrain() #get last trained email

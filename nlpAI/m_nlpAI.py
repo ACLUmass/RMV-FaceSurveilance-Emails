@@ -132,12 +132,12 @@ class model():
 
 
   #get next or previous email that matches AI hypo
-  def getSearchMail(self,fwd,hypo):
+  def getSearchMail(self,fwd,aiHypoIn,huHypoIn):
     while True:
       mailId,email,aiHypo,huHypo = self.getReadMail(fwd)
-      if mailId == 'none' or aiHypo == hypo:
+      if mailId == 'none' or aiHypoIn == aiHypo:
         break
-    return(mailId,email,huHypo)
+    return(mailId,email,aiHypo,huHypo)
 
 
   #goto a mailId
