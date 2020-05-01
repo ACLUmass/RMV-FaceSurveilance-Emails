@@ -24,9 +24,7 @@ class ctl():
       (mailId,email,aiHypo,huHypo) = self.m.getSearchMail(True,self.v.aiHypo.getVal(),self.v.huHypo.getVal()) #forward search next AI email that matches hypo
       self.v.huHypo.setVal(huHypo)
     else:  #Train mode - train current email and fetch random untrained emails
-      trainCt,trainTrue = self.m.chgCurTrain(self.v.huHypo.getVal()) #train current email
-      self.v.trainedLbl.setVal(trainCt) #set training stats
-      self.v.trueLbl.setVal(trainTrue)
+      self.chgTrain()
       mailId,email,huHypo = self.m.getNextTrain() #get next email to train
       self.v.huHypo.setVal(huHypo)
     self.v.nextVback(mailId,email) #view part of callback is here
@@ -40,30 +38,59 @@ class ctl():
       (mailId,email,aiHypo,huHypo) = self.m.getSearchMail(False,self.v.aiHypo.getVal(),self.v.huHypo.getVal()) #forward search next AI email that matches hypo
       self.v.huHypo.setVal(huHypo)
     else: #Train mode
-      mailId,email,huHypo = self.m.getPrevTrain() #get last trained email
-    self.v.huHypo.setVal(huHypo)
+      self.chgTrain()
+      mailId,email,huHypo = self.m.getPrevTrain() #get previous email trained
+      self.v.huHypo.setVal(huHypo)
     self.v.nextVback(mailId,email) #view part of callback is here
     return
 
+  def chgTrain(self):
+    trainCt,trainTrue = self.m.chgCurTrain(self.v.huHypo.getVal()) #train current email
+    self.v.trainedLbl.setVal(trainCt) #set training stats
+    self.v.trueLbl.setVal(trainTrue)
+    self.trainSz()
+    return
+
+  def modeCback(self):
+    mode = self.v.mode['text']  #get the current mode
+    if mode == 'Train': #leaving training so save latest training
+      self.chgTrain()
+      #trainCt,trainTrue = self.m.chgCurTrain(self.v.huHypo.getVal()) #train current email
+      #self.v.trainedLbl.setVal(trainCt) #set training stats
+      #self.v.trueLbl.setVal(trainTrue)
+      #self.trainSz()
+    self.v.modeVback() #go to new mode
+    return
+
+
   def gotoCback(self,dummy): #dummy is the return character that we don't need
+    mode = self.v.mode['text']  #get the current mode
+    if mode == 'Train': #leaving training so save latest training
+      self.chgTrain()
     gotoId = self.v.getGotoId()  #get the mailID from the entry box
     mailId,email = self.m.getGotoMail(gotoId)
     self.v.gotoVback(mailId,email) #view part of callback is here
     return
 
-
-  def confCback(self,dummy): #dummy is the return character that we don't need
+  def trainSz(self):
     conf = self.v.conf.getVal()  #get the confidence value
-    sz = stats.samSz(int(conf)/100.0,0.50,self.m.mailCt)
+    if self.m.trainCt == 0:
+      tmp = 0.50
+    else:
+      tmp = self.m.trainTrue/self.m.trainCt
+    sz = stats.samSz(int(conf)/100.0,tmp,self.m.mailCt)
     self.v.trainNeedLbl.setVal(int(sz))
     return
 
 
+  def confCback(self,dummy): #dummy is the return character that we don't need
+    self.trainSz()
+    return
+
+
   def mailCtCback(self,dummy): #dummy is the return character that we don't need
-    conf = self.v.conf.getVal()  #get the confidence value
     self.m.mailCt = int(self.v.mailCt.getVal())  #get the size of the mail sample to use
-    sz = stats.samSz(int(conf)/100.0,0.50,self.m.mailCt) #and recalculate the needed training size
-    self.v.trainNeedLbl.setVal(int(sz))
+    self.trainSz()
     return
 
   def runAICback(self):
@@ -74,12 +101,13 @@ class ctl():
     return
 
   def run(self):
-    self.v.setVbacks(self.nextCback,self.prevCback,self.gotoCback,self.runAICback,self.confCback,self.mailCtCback) #give view pointers to controller callback methods
+    self.v.setVbacks(self.modeCback,self.nextCback,self.prevCback,self.gotoCback,self.runAICback,self.confCback,self.mailCtCback) #give view pointers to controller callback methods
 
     self.v.trainedLbl.setVal(self.m.trainCt) #set existing stats
     self.v.trueLbl.setVal(self.m.trainTrue)
     self.v.mailCt.setVal(self.m.mailCt)
 
+    self.trainSz()
     (mailId,email,aiHypo,huHypo) = self.m.getReadMail(True) #point to first email to read
     self.v.aiHypo.setVal(aiHypo)
     self.v.huHypo.setVal(huHypo)

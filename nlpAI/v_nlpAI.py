@@ -72,7 +72,7 @@ class view():
     self.conf.lblFr.pack(side=TOP)
     self.conf.setVal(75)
     self.trainResult = lblVal(self.stats, 'train result',10)
-    self.trainNeedLbl = lblVal(self.stats, 'train needed',10)
+    self.trainNeedLbl = lblVal(self.stats, 'train size',10)
     self.trainedLbl = lblVal(self.stats, 'trained',10)
     self.trueLbl = lblVal(self.stats, 'trained true',10)
     self.trueClass = lblVal(self.stats, 'AI true',10)
@@ -122,7 +122,7 @@ class view():
 
     self.hypoDsc = Entry(self.ctls, bd = 5)
     self.hypoDsc.pack(side = RIGHT)
-    self.L1 = Label(self.ctls, text = "Class")
+    self.L1 = Label(self.ctls, text = "Hypo")
     self.L1.pack( side = RIGHT)
 
     self.L2 = Label(self.ctls, text = "Goto")
@@ -155,8 +155,6 @@ class view():
       tmp = self.huHypo.getVal()
       if tmp == 'True':
         self.huHypo.setVal('False')
-      #`if tmp == 'False':
-      #`  self.huHypo.setVal('None')
       else:
         self.huHypo.setVal('True')
 
@@ -165,19 +163,17 @@ class view():
       tmp = self.aiHypo.getVal()
       if tmp == 'True':
         self.aiHypo.setVal('False')
-      #if tmp == 'False':
-      #  self.aiHypo.setVal('None')
       else:
         self.aiHypo.setVal('True')
 
 
 
   #pointers to controller parts of callback operations are set her
-  def setVbacks(self,nextCback,prevCback,gotoCback,runAICback,confCback,mailCtCback):
-    self.mode.config(command = self.modeVback)
+  def setVbacks(self,modeCback,nextCback,prevCback,gotoCback,runAICback,confCback,mailCtCback):
     self.huHypo.button.config(command = self.huHypoVback)
     self.aiHypo.button.config(command = self.aiHypoVback)
 
+    self.mode.config(command = modeCback)
     self.next.config(command = nextCback)
     self.prev.config(command = prevCback)
     self.goto.bind('<Return>', gotoCback)
