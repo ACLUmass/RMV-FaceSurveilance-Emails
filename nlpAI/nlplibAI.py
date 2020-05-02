@@ -100,7 +100,7 @@ def mkSet(documents):
 
 
 #===================================================
-def rfc(X_train,X_test,y_train):
+def rfa(X_train,X_test,y_train):
   from sklearn.ensemble import RandomForestClassifier
 #https://stackabuse.com/random-forest-algorithm-with-python-and-scikit-learn/
   classifier = RandomForestClassifier(n_estimators=1000, random_state=0)
