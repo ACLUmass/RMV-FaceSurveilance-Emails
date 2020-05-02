@@ -15,13 +15,16 @@ import nlplibAI as ai
 #true     false       false positive - low specificity
 
 class model():
-  def __init__(self,fileNm): #setup everything without controller callbacks
+  def __init__(self,fileNm,aiSz): #setup everything without controller callbacks
     #build a database of all the emails with images
     inf = open(fileNm, 'r')
     r = inf.read()  #read in all the bytes into one string
     self.mails = json.loads(r)
     self.idx = None 
-    self.mailCt = len(self.mails)
+    if aiSz == None:
+      self.mailCt = len(self.mails)
+    else:
+      self.mailCt = int(aiSz)
     self.trainCt = 0
     self.trainTrue = 0
     self.aiTrue = 0
@@ -29,12 +32,14 @@ class model():
     self.falseNeg = None
     self.trains = [] #in train mode mailIdx moves forward randomly and backward by popping off this list
     for i in range(self.mailCt):
+      if not 'ai' in self.mails[i]:
+        self.mails[i]['ai'] = 'None'
       if 'train' in self.mails[i]:
         self.trainCt += 1
         if self.mails[i]['train'] == 'True':
           self.trainTrue += 1
-      #else:
-      #  self.mails[i]['train'] = 'None'
+      else:
+        self.mails[i]['train'] = 'None'
 
   def fileSv(self,fileNm): #save the results
     with open(fileNm, 'w') as f:
@@ -82,16 +87,16 @@ class model():
   #add training to current email and fetch a new random one to train
   def getNextTrain(self):
     if self.trainCt == self.mailCt: #nothing left to train
-      return('none','all trained')
+      return('none','all trained','None')
     self.trains.append(self.idx) #put current idx on list for going in reverse
     while True: #find a mail that has not been trained already
       self.idx = random.randint(0,self.mailCt - 1) 
-      if not 'train' in  self.mails[self.idx].keys():
+      mail = self.mails[self.idx]
+      if mail['train'] == 'None':
         break
 
-    mail = self.mails[self.idx]
     mailId,email =  self.formText(mail)
-    return(mailId,email,'None')
+    return(mailId,email,mail['ai'],'None')
 
   #update training to current email and fetch previously trained email plus its training
   def getPrevTrain(self):
@@ -134,7 +139,7 @@ class model():
 
 
   #get next or previous email that matches AI hypo
-  def getSearchMail(self,fwd,aiHypoIn,huHypoIn):
+  def getSearchMail(self,fwd,aiHypoIn):
     while True:
       mailId,email,aiHypo,huHypo = self.getReadMail(fwd)
       if mailId == 'none' or aiHypoIn == aiHypo:
@@ -152,7 +157,7 @@ class model():
 
     mail = self.mails[self.idx]
     mailId,email =  self.formText(mail) #found it!
-    return(mailId,email)
+    return(mailId,email,mail['ai'],mail['train'])
 
   def runAI(self):
     rawMail = []  #byte form of each email
@@ -196,9 +201,11 @@ class model():
       ptr = trainPtrs[i] 
       aiHypo = self.mails[ptr]['ai']
       huHypo = self.mails[ptr]['train']
-      if aiHypo != huHypo: #by definition the human is always right 
-        if aiHypo == 'True':
-          self.falsePos += 1
-        else:
-          self.falseNeg += 1
-      
+      if aiHypo != 'None' and huHypo != 'None': 
+        if aiHypo != huHypo: #by definition the human is always right 
+          if aiHypo == 'True':
+            self.falsePos += 1
+          else:
+            self.falseNeg += 1
+
+    return(self.aiTrue,self.falsePos,self.falseNeg)      

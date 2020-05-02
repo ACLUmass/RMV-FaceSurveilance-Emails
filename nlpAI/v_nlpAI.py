@@ -56,6 +56,7 @@ class view():
   def __init__(self): #setup everything without controller callbacks
     #layout the frames in the top window
     self.top = Tk()
+    self.c = None
     self.top.title('Email AI Classifier')
     self.grp = Frame(self.top) #put a group subframe for stats and email at the top of window
     self.grp.pack(side=TOP)
@@ -70,16 +71,16 @@ class view():
     self.runAI.pack(side = TOP)
     self.conf = lblEntry(self.stats, 'confidence %',10)
     self.conf.lblFr.pack(side=TOP)
-    self.conf.setVal(75)
+    #$self.conf.setVal(75)
     self.trainResult = lblVal(self.stats, 'train result',10)
     self.trainNeedLbl = lblVal(self.stats, 'train size',10)
     self.trainedLbl = lblVal(self.stats, 'trained',10)
     self.trueLbl = lblVal(self.stats, 'trained true',10)
+    self.mailCt = lblVal(self.stats, 'AI Size',10)
     self.trueClass = lblVal(self.stats, 'AI true',10)
     self.falsePos = lblVal(self.stats, 'bad AI true',10)
     self.falseNeg = lblVal(self.stats, 'bad AI false',10)
-    self.mailCt = lblEntry(self.stats, 'mail count',10)
-    self.mailCt.lblFr.pack(side=TOP)
+    #self.mailCt.lblFr.pack(side=TOP)
 
 
 ################# Email Reader Subframe ################################
@@ -154,9 +155,11 @@ class view():
     if self.mode['text'] == 'Train': #user change allowed only in train mode
       tmp = self.huHypo.getVal()
       if tmp == 'True':
-        self.huHypo.setVal('False')
+        tmp = 'False'
       else:
-        self.huHypo.setVal('True')
+        tmp = 'True'
+      self.huHypo.setVal(tmp)
+      self.c.chgTrain(tmp)
 
   def aiHypoVback(self):
     if self.mode['text'] == 'Search': #user change allowed because search is on aiHypo
@@ -167,31 +170,51 @@ class view():
         self.aiHypo.setVal('True')
 
 
+  def confVback(self,dummy): #dummy is the return character that we don't need
+    sz = self.c.trainSz(self.conf.getVal())
+    self.trainNeedLbl.setVal(int(sz))
 
   #pointers to controller parts of callback operations are set her
-  def setVbacks(self,modeCback,nextCback,prevCback,gotoCback,runAICback,confCback,mailCtCback):
+  def setVbacks(self,c,modeCback,nextCback,prevCback,gotoCback,runAICback,confCback,mailCtCback):
+    self.c = c
     self.huHypo.button.config(command = self.huHypoVback)
     self.aiHypo.button.config(command = self.aiHypoVback)
+    self.mode.config(command = self.modeVback)
+    self.goto.bind('<Return>', self.getGoto)
+    self.conf.entry.bind('<Return>', self.confVback)
+    self.runAI.config(command = self.runAIVback)
 
-    self.mode.config(command = modeCback)
-    self.next.config(command = nextCback)
+    self.next.config(command = self.nextVback)
     self.prev.config(command = prevCback)
-    self.goto.bind('<Return>', gotoCback)
-    self.runAI.config(command = runAICback)
-    self.conf.entry.bind('<Return>', confCback)
-    self.mailCt.entry.bind('<Return>', mailCtCback)
+    #self.conf.entry.bind('<Return>', confCback)
+    #self.mailCt.entry.bind('<Return>', mailCtCback)
 
-  def getGotoId(self): #get the contents of goto Entry box
-    return self.goto.get()
+  #def getGotoId(self): #get the contents of goto Entry box
+  #  return self.goto.get()
 
-  def nextVback(self,mailId,email):
+  def getGoto(self,dummy): #get the contents of goto Entry box
+    #return self.goto.get()
+    mailId,email,aiHypo,huHypo = self.c.gotoCback(self.goto.get())
+    self.ldEmail(mailId,email)
+    self.aiHypo.setVal(aiHypo)
+    self.huHypo.setVal(huHypo)
+
+  def nextVback(self):
+    mailId,email,aiHypo,huHypo = self.c.nextCback(self.mode['text'],self.aiHypo.getVal())
+    self.aiHypo.setVal(aiHypo)
+    self.huHypo.setVal(huHypo)
     self.ldEmail(mailId,email)
 
   def prevVback(self,mailId,email):
     self.ldEmail(mailId,email)
-  def gotoVback(self,mailId,email):
-    self.ldEmail(mailId,email)
 
-  def runAIVback(self,msg):
-    self.runAI.config(text = msg)
+  #def gotoVback(self,mailId,email):
+  #  self.ldEmail(mailId,email)
+
+  def runAIVback(self):
+    aiTrue,falsePos,falseNeg = self.c.runAICback()
+    self.trueClass.setVal(aiTrue)
+    self.falsePos.setVal(falsePos)
+    self.falseNeg.setVal(falseNeg)
+ 
 
