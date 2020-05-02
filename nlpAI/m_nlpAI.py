@@ -181,7 +181,7 @@ class model():
         else:
           trainHypos.append(0)
 
-    allHypos = ai.rfc(trainSets,allSets,trainHypos)
+    allHypos = ai.rfa(trainSets,allSets,trainHypos)
     self.aiTrue = 0
     for i in range(self.mailCt): #create training sets
       if allHypos[i] == 1:
