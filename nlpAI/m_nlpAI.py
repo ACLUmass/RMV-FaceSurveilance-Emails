@@ -70,12 +70,13 @@ class model():
 
   #change current training of current email its training stats
   def chgCurTrain(self,hypo):
-    if not 'train' in self.mails[self.idx].keys(): #has not been trained yet
+    mail = self.mails[self.idx]
+    if mail['train'] == 'None': #has not been trained yet
       self.trainCt += 1
       if hypo == 'True':
         self.trainTrue += 1
     else:  #previously trained
-      if hypo != self.mails[self.idx]['train']: #changing training
+      if hypo != mail['train']: #changing training
         if hypo == 'True': #false to true
           self.trainTrue += 1
         else: #true to false

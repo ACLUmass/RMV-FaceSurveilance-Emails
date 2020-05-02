@@ -18,9 +18,7 @@ class lblVal():
 
 class lblEntry():
   def __init__(self,root,label,wd):
-    #self.lblFr = LabelFrame(root, text = label, labelanchor = 'w')
     self.lblFr = LabelFrame(root, text = label)
-    #self.lblFr.pack(side=TOP)
     self.entry = Entry(self.lblFr, width=wd, bd=5)
     self.entry.pack(side = TOP)
 
@@ -39,7 +37,6 @@ class lblButton():
     self.button.pack(side = RIGHT)
 
   def getVal(self):
-    #return self.button.get()
     return self.button['text']
 
   def setVal(self,val):
@@ -71,7 +68,6 @@ class view():
     self.runAI.pack(side = TOP)
     self.conf = lblEntry(self.stats, 'confidence %',10)
     self.conf.lblFr.pack(side=TOP)
-    #$self.conf.setVal(75)
     self.trainResult = lblVal(self.stats, 'train result',10)
     self.trainNeedLbl = lblVal(self.stats, 'train size',10)
     self.trainedLbl = lblVal(self.stats, 'trained',10)
@@ -80,7 +76,6 @@ class view():
     self.trueClass = lblVal(self.stats, 'AI true',10)
     self.falsePos = lblVal(self.stats, 'bad AI true',10)
     self.falseNeg = lblVal(self.stats, 'bad AI false',10)
-    #self.mailCt.lblFr.pack(side=TOP)
 
 
 ################# Email Reader Subframe ################################
@@ -101,7 +96,6 @@ class view():
     self.ctls.pack(side=TOP,fill=X)
 
     self.ctlsPad = Frame(self.ctls,width=5)
-    #self.ctlsPad.pack(side = TOP)
     self.ctlsPad.pack(side = RIGHT)
 
     self.mode = Button(self.ctls, text = 'Read', width=6, height=2)
@@ -113,13 +107,11 @@ class view():
     self.next = Button(self.ctls, text = "Next", height=2)
     self.next.pack(side = RIGHT)
 
-    #self.hypo = Button(self.ctls, width = 5)
     self.huHypo = lblButton(self.ctls, 'human',6)
     self.huHypo.lblFr.pack(side=RIGHT)
 
     self.aiHypo = lblButton(self.ctls, 'ai',6)
     self.aiHypo.lblFr.pack(side=RIGHT)
-    #self.hypo.pack(side = RIGHT)
 
     self.hypoDsc = Entry(self.ctls, bd = 5)
     self.hypoDsc.pack(side = RIGHT)
@@ -159,7 +151,10 @@ class view():
       else:
         tmp = 'True'
       self.huHypo.setVal(tmp)
-      self.c.chgTrain(tmp)
+      trainCt,trainTrue,trainSz = self.c.chgTrain(tmp,self.conf.getVal())
+      self.trainedLbl.setVal(trainCt) #set training stats
+      self.trueLbl.setVal(trainTrue)
+      self.trainNeedLbl.setVal(trainSz)
 
   def aiHypoVback(self):
     if self.mode['text'] == 'Search': #user change allowed because search is on aiHypo
@@ -169,47 +164,28 @@ class view():
       else:
         self.aiHypo.setVal('True')
 
-
   def confVback(self,dummy): #dummy is the return character that we don't need
     sz = self.c.trainSz(self.conf.getVal())
     self.trainNeedLbl.setVal(int(sz))
 
-  #pointers to controller parts of callback operations are set her
-  def setVbacks(self,c,modeCback,nextCback,prevCback,gotoCback,runAICback,confCback,mailCtCback):
-    self.c = c
-    self.huHypo.button.config(command = self.huHypoVback)
-    self.aiHypo.button.config(command = self.aiHypoVback)
-    self.mode.config(command = self.modeVback)
-    self.goto.bind('<Return>', self.getGoto)
-    self.conf.entry.bind('<Return>', self.confVback)
-    self.runAI.config(command = self.runAIVback)
-
-    self.next.config(command = self.nextVback)
-    self.prev.config(command = prevCback)
-    #self.conf.entry.bind('<Return>', confCback)
-    #self.mailCt.entry.bind('<Return>', mailCtCback)
-
-  #def getGotoId(self): #get the contents of goto Entry box
-  #  return self.goto.get()
-
   def getGoto(self,dummy): #get the contents of goto Entry box
-    #return self.goto.get()
     mailId,email,aiHypo,huHypo = self.c.gotoCback(self.goto.get())
     self.ldEmail(mailId,email)
     self.aiHypo.setVal(aiHypo)
     self.huHypo.setVal(huHypo)
 
   def nextVback(self):
-    mailId,email,aiHypo,huHypo = self.c.nextCback(self.mode['text'],self.aiHypo.getVal())
+    mailId,email,aiHypo,huHypo = self.c.nextCback(True,self.mode['text'],self.aiHypo.getVal())
     self.aiHypo.setVal(aiHypo)
     self.huHypo.setVal(huHypo)
     self.ldEmail(mailId,email)
 
-  def prevVback(self,mailId,email):
-    self.ldEmail(mailId,email)
-
-  #def gotoVback(self,mailId,email):
-  #  self.ldEmail(mailId,email)
+  def prevVback(self):
+    if self.mode['text'] != 'Train':
+      mailId,email,aiHypo,huHypo = self.c.nextCback(False,self.mode['text'],self.aiHypo.getVal())
+      self.aiHypo.setVal(aiHypo)
+      self.huHypo.setVal(huHypo)
+      self.ldEmail(mailId,email)
 
   def runAIVback(self):
     aiTrue,falsePos,falseNeg = self.c.runAICback()
@@ -217,4 +193,15 @@ class view():
     self.falsePos.setVal(falsePos)
     self.falseNeg.setVal(falseNeg)
  
+  #pointers to controller parts of callback operations are set her
+  def setVbacks(self,c):
+    self.c = c
+    self.huHypo.button.config(command = self.huHypoVback)
+    self.aiHypo.button.config(command = self.aiHypoVback)
+    self.mode.config(command = self.modeVback)
+    self.goto.bind('<Return>', self.getGoto)
+    self.conf.entry.bind('<Return>', self.confVback)
+    self.runAI.config(command = self.runAIVback)
+    self.next.config(command = self.nextVback)
+    self.prev.config(command = self.prevVback)
 
