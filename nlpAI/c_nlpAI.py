@@ -15,86 +15,84 @@ class ctl():
     self.m = model
 
   #create all the controller methods that the view object uses as callbacks
-  def nextCback(self): #move forward in emails
-    if self.v.mode['text'] == "Read": #get next in email list
-      (mailId,email,aiHypo,huHypo) = self.m.getReadMail(True) #forward read next email
-      self.v.aiHypo.setVal(aiHypo)
-      self.v.huHypo.setVal(huHypo)
-    elif self.v.mode['text'] == "Search": #search for next that matches aiHypo
-      (mailId,email,huHypo) = self.m.getSearchMail(True,self.v.aiHypo.getVal()) #forward search next AI email that matches hypo
-      self.v.huHypo.setVal(huHypo)
+  def nextCback(self,fwd,mode,aiHypo): #move forward in emails
+    if mode == "Read": #get next in email list
+      (mailId,email,aiHypo,huHypo) = self.m.getReadMail(fwd) #forward read next email
+    elif mode == "Search": #search for next that matches aiHypo
+      (mailId,email,aiHypo,huHypo) = self.m.getSearchMail(fwd,aiHypo) #forward search next AI email that matches hypo
     else:  #Train mode - train current email and fetch random untrained emails
-      trainCt,trainTrue = self.m.chgCurTrain(self.v.huHypo.getVal()) #train current email
-      self.v.trainedLbl.setVal(trainCt) #set training stats
-      self.v.trueLbl.setVal(trainTrue)
-      mailId,email,huHypo = self.m.getNextTrain() #get next email to train
-      self.v.huHypo.setVal(huHypo)
-    self.v.nextVback(mailId,email) #view part of callback is here
+      mailId,email,aiHypo,huHypo = self.m.getNextTrain() #get next email to train
+    return(mailId,email,aiHypo,huHypo) #view part of callback is here
 
   def prevCback(self): #move backward in emails
-    if self.v.mode['text'] == "Read":
-      (mailId,email,aiHypo,huHypo) = self.m.getReadMail(False) #backward read next email
-      self.v.aiHypo.setVal(aiHypo)
-      self.v.huHypo.setVal(huHypo)
-    elif self.v.mode['text'] == "Search":
-      (mailId,email,huHypo) = self.m.getSearchMail(False,self.v.aiHypo.getVal()) #forward search next AI email that matches hypo
-      self.v.huHypo.setVal(huHypo)
-    else: #Train mode
-      mailId,email,huHypo = self.m.getPrevTrain() #get last trained email
-    self.v.huHypo.setVal(huHypo)
-    self.v.nextVback(mailId,email) #view part of callback is here
-    return
+    if mode == "Read": #get next in email list
+      (mailId,email,aiHypo,huHypo) = self.m.getReadMail(True) #forward read next email
+    elif mode == "Search": #search for next that matches aiHypo
+      (mailId,email,aiHypo,huHypo) = self.m.getSearchMail(True,aiHypo) #forward search next AI email that matches hypo
+    else:  #Train mode - train current email and fetch random untrained emails
+      mailId,email,aiHypo,huHypo = self.m.getNextTrain() #get next email to train
+    return(mailId,email,aiHypo,huHypo) #view part of callback is here
 
-  def gotoCback(self,dummy): #dummy is the return character that we don't need
-    gotoId = self.v.getGotoId()  #get the mailID from the entry box
-    mailId,email = self.m.getGotoMail(gotoId)
-    self.v.gotoVback(mailId,email) #view part of callback is here
-    return
+  def chgTrain(self,huHypo,conf):
+    trainCt,trainTrue = self.m.chgCurTrain(huHypo) #train current email
+    trainSz = int(self.trainSz(conf))
+    return(trainCt,trainTrue,trainSz)
 
+  def gotoCback(self,gotoId): #dummy is the return character that we don't need
+    return(self.m.getGotoMail(gotoId))
 
-  def confCback(self,dummy): #dummy is the return character that we don't need
-    conf = self.v.conf.getVal()  #get the confidence value
-    sz = stats.samSz(int(conf)/100.0,0.50,self.m.mailCt)
-    self.v.trainNeedLbl.setVal(int(sz))
-    return
-
-
-  def mailCtCback(self,dummy): #dummy is the return character that we don't need
-    conf = self.v.conf.getVal()  #get the confidence value
-    self.m.mailCt = int(self.v.mailCt.getVal())  #get the size of the mail sample to use
-    sz = stats.samSz(int(conf)/100.0,0.50,self.m.mailCt) #and recalculate the needed training size
-    self.v.trainNeedLbl.setVal(int(sz))
-    return
+  def trainSz(self,conf):
+    if self.m.trainCt == 0:
+      tmp = 0.50
+    else:
+      tmp = self.m.trainTrue/self.m.trainCt
+    return stats.samSz(int(conf)/100.0,tmp,self.m.mailCt)
 
   def runAICback(self):
-    self.m.runAI()
-    self.v.trueClass.setVal(self.m.aiTrue)
-    self.v.falsePos.setVal(self.m.falsePos)
-    self.v.falseNeg.setVal(self.m.falseNeg)
-    return
+    aiTrue,falsePos,falseNeg = self.m.runAI()
+    return(aiTrue,falsePos,falseNeg)
 
-  def run(self):
-    self.v.setVbacks(self.nextCback,self.prevCback,self.gotoCback,self.runAICback,self.confCback,self.mailCtCback) #give view pointers to controller callback methods
+  def run(self,c):
+    self.v.setVbacks(c)
 
     self.v.trainedLbl.setVal(self.m.trainCt) #set existing stats
     self.v.trueLbl.setVal(self.m.trainTrue)
     self.v.mailCt.setVal(self.m.mailCt)
+    conf = 75
+    self.v.conf.setVal(conf)
+    sz = self.trainSz(conf)
+    self.v.trainNeedLbl.setVal(int(sz))
 
     (mailId,email,aiHypo,huHypo) = self.m.getReadMail(True) #point to first email to read
     self.v.aiHypo.setVal(aiHypo)
     self.v.huHypo.setVal(huHypo)
-    self.v.nextVback(mailId,email) #view part of callback is here
+    self.v.ldEmail(mailId,email) #view part of callback is here
     self.v.run() #run the tkinter loop
 
 #create the view object first because it will be needed in callbacks
-v = view.view()
-m = model.model(sys.argv[1])
-c = ctl(v,m)
+outfile = None
+aiSz = None
 try:
-  dstfileNm = sys.argv[2]
+  tmp = sys.argv[2]
+  if tmp[0] != '-':
+    dstFileNm = tmp
+  else:
+    aiSz = tmp[1:]
+  try:
+    tmp = sys.argv[3]
+    if tmp != '-':
+      dstFileNm = tmp
+    else:
+      aiSz = tmp[1:]
+  except:
+    pass
 except:
-  dstfileNm = None
-c.run()
+  pass
+
+v = view.view()
+m = model.model(sys.argv[1],aiSz) #infile json
+c = ctl(v,m)
+c.run(c)
 if dstfileNm != None: #save the results 
   m.fileSv(dstfileNm)
 
