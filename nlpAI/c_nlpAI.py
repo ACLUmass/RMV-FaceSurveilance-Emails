@@ -48,16 +48,32 @@ class ctl():
       tmp = self.m.trainTrue/self.m.trainCt
     return stats.samSz(int(conf)/100.0,tmp,self.m.mailCt)
 
-  def runAICback(self):
-    aiTrue,falsePos,falseNeg = self.m.runAI()
-    return(aiTrue,falsePos,falseNeg)
+  def trainConf(self,trainGoal,errMargin):
+    aiConf = '{:6.2f}'.format(stats.samConf(int(trainGoal),float(errMargin),0.5,self.m.mailCt)*100)
+    return aiConf
+
+  #def errMargin(self,trainGoal,errMargin):
+  #  conf = '{:6.2f}'.format(stats.samConf(int(trainGoal),float(errMargin),0.5,self.m.mailCt)*100)
+  #  return conf
+
+  def runAICback(self,errMargin):
+    aiTrue,falsePos,falseNeg,aiOK = self.m.runAI(errMargin)
+    return(aiTrue,falsePos,falseNeg,aiOK)
 
   def run(self,c):
     self.v.setVbacks(c)
 
     self.v.trainedLbl.setVal(self.m.trainCt) #set existing stats
     self.v.trueLbl.setVal(self.m.trainTrue)
-    self.v.mailCt.setVal(self.m.mailCt)
+    mailCt = self.m.mailCt
+    self.v.mailCt.setVal(mailCt)
+    trainGoal = int(mailCt*0.75)
+    self.v.trainGoal.setVal(trainGoal)
+    errMargin = 0.05
+    self.v.errMargin.setVal(errMargin)
+    aiConf = '{:6.2f}'.format(stats.samConf(trainGoal,errMargin,0.5,mailCt)*100)
+    self.v.aiConf.setVal(aiConf)
+
     conf = 75
     self.v.conf.setVal(conf)
     sz = self.trainSz(conf)
