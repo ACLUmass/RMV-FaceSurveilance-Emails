@@ -66,9 +66,14 @@ class view():
     self.statsPad.pack(side = TOP)
     self.runAI = Button(self.stats, text = "runAI",width=10,height=2)
     self.runAI.pack(side = TOP)
+    self.aiOK = lblVal(self.stats, 'AI OK',10)
+    self.trainGoal = lblEntry(self.stats, 'train goal',10)
+    self.trainGoal.lblFr.pack(side=TOP)
+    self.errMargin = lblEntry(self.stats, 'err margin %',10)
+    self.errMargin.lblFr.pack(side=TOP)
+    self.aiConf = lblVal(self.stats, 'AI confidence %',10)
     self.conf = lblEntry(self.stats, 'confidence %',10)
     self.conf.lblFr.pack(side=TOP)
-    self.trainResult = lblVal(self.stats, 'train result',10)
     self.trainNeedLbl = lblVal(self.stats, 'train size',10)
     self.trainedLbl = lblVal(self.stats, 'trained',10)
     self.trueLbl = lblVal(self.stats, 'trained true',10)
@@ -153,6 +158,7 @@ class view():
       self.huHypo.setVal(tmp)
       trainCt,trainTrue,trainSz = self.c.chgTrain(tmp,self.conf.getVal())
       self.trainedLbl.setVal(trainCt) #set training stats
+      #self.aiConf.setVal(aiConf) #set training stats
       self.trueLbl.setVal(trainTrue)
       self.trainNeedLbl.setVal(trainSz)
 
@@ -167,6 +173,16 @@ class view():
   def confVback(self,dummy): #dummy is the return character that we don't need
     sz = self.c.trainSz(self.conf.getVal())
     self.trainNeedLbl.setVal(int(sz))
+
+  def trGoalVback(self,dummy): #dummy is the return character that we don't need
+    conf = self.c.trainConf(self.trainGoal.getVal(),self.errMargin.getVal())
+    #self.aiConf.setVal('{:6.2f}'.format(conf))
+    self.aiConf.setVal(conf)
+
+  def errMarginVback(self,dummy): #dummy is the return character that we don't need
+    conf = self.c.errMargin(self.trainGoal.getVal(),self.errMargin.getVal())
+    #self.aiConf.setVal('{:6.2f}'.format(conf))
+    self.aiConf.setVal(conf)
 
   def getGoto(self,dummy): #get the contents of goto Entry box
     mailId,email,aiHypo,huHypo = self.c.gotoCback(self.goto.get())
@@ -188,10 +204,18 @@ class view():
       self.ldEmail(mailId,email)
 
   def runAIVback(self):
-    aiTrue,falsePos,falseNeg = self.c.runAICback()
+    aiTrue,falsePos,falseNeg,aiOK = self.c.runAICback(float(self.errMargin.getVal()))
     self.trueClass.setVal(aiTrue)
     self.falsePos.setVal(falsePos)
     self.falseNeg.setVal(falseNeg)
+    if aiOK == True:
+      self.aiOK.setVal('Pass')
+      self.aiOK.lblFr.config(bg='#7fff7f')
+    else:
+      self.aiOK.setVal('Fail')
+      self.aiOK.lblFr.config(bg='#ff7f7f')
+
+    
  
   #pointers to controller parts of callback operations are set her
   def setVbacks(self,c):
@@ -204,4 +228,6 @@ class view():
     self.runAI.config(command = self.runAIVback)
     self.next.config(command = self.nextVback)
     self.prev.config(command = self.prevVback)
+    self.trainGoal.entry.bind('<Return>', self.trGoalVback)
+    self.errMargin.entry.bind('<Return>', self.trGoalVback)
 

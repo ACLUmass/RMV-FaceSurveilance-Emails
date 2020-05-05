@@ -160,7 +160,7 @@ class model():
     mailId,email =  self.formText(mail) #found it!
     return(mailId,email,mail['ai'],mail['train'])
 
-  def runAI(self):
+  def runAI(self,errMargin):
     rawMail = []  #byte form of each email
     allBows = []  #byte representaton of all emails
 
@@ -209,4 +209,9 @@ class model():
           else:
             self.falseNeg += 1
 
-    return(self.aiTrue,self.falsePos,self.falseNeg)      
+    if abs((self.trainTrue/self.trainCt) - self.aiTrue/self.mailCt) > errMargin:
+      aiOK = False
+    else:
+      aiOK = True
+
+    return(self.aiTrue,self.falsePos,self.falseNeg,aiOK)      
