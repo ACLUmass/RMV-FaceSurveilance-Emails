@@ -88,7 +88,7 @@ class model():
   #add training to current email and fetch a new random one to train
   def getNextTrain(self):
     if self.trainCt == self.mailCt: #nothing left to train
-      return('none','all trained','None')
+      return('none','all trained','None','None')
     self.trains.append(self.idx) #put current idx on list for going in reverse
     while True: #find a mail that has not been trained already
       self.idx = random.randint(0,self.mailCt - 1) 
@@ -103,12 +103,12 @@ class model():
   def getPrevTrain(self):
     if len(self.trains) == 0: #walked all the way back
       self.idx = None
-      return('none','all the way back','')
+      return('none','all the way back','None','None')
     self.idx = self.trains.pop()
 
     mail = self.mails[self.idx]
     mailId,email =  self.formText(mail)
-    return(mailId,email,mail['train'])
+    return(mailId,email,mail['ai'],mail['train'])
 
   #get next or previous email linearly plus its current AI state
   def getReadMail(self,fwd):
