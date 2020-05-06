@@ -227,14 +227,14 @@ class view():
     self.ldEmail(mailId,email)
 
   def prevVback(self):
-    if self.mode['text'] != 'Train':
-      mailId,email,aiHypo,huHypo = self.c.nextCback(False,self.mode['text'],self.aiHypo.getVal())
-      self.aiHypo.setVal(aiHypo)
-      self.huHypo.setVal(huHypo)
-      self.ldEmail(mailId,email)
+    #if self.mode['text'] != 'Train':
+    mailId,email,aiHypo,huHypo = self.c.nextCback(False,self.mode['text'],self.aiHypo.getVal())
+    self.aiHypo.setVal(aiHypo)
+    self.huHypo.setVal(huHypo)
+    self.ldEmail(mailId,email)
 
   def runAIVback(self):
-    aiTrue,falsePos,falseNeg,aiOK = self.c.runAICback(float(self.errMargin.getVal()),self.aiAlg['text'])
+    aiTrue,falsePos,falseNeg,aiOK = self.c.runAICback(float(self.errMargin.getVal()),self.aiAlg.getVal())
     self.trueClass.setVal(aiTrue)
     self.falsePos.setVal(falsePos)
     self.falseNeg.setVal(falseNeg)

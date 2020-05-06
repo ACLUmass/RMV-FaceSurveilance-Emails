@@ -21,17 +21,21 @@ class ctl():
     elif mode == "Search": #search for next that matches aiHypo
       (mailId,email,aiHypo,huHypo) = self.m.getSearchMail(fwd,aiHypo) #forward search next AI email that matches hypo
     else:  #Train mode - train current email and fetch random untrained emails
-      mailId,email,aiHypo,huHypo = self.m.getNextTrain() #get next email to train
+      if fwd == True:
+        mailId,email,aiHypo,huHypo = self.m.getNextTrain() #get next email to train
+      else:
+        mailId,email,aiHypo,huHypo = self.m.getPrevTrain() #get previous email to train
     return(mailId,email,aiHypo,huHypo) #view part of callback is here
 
-  def prevCback(self): #move backward in emails
-    if mode == "Read": #get next in email list
-      (mailId,email,aiHypo,huHypo) = self.m.getReadMail(True) #forward read next email
-    elif mode == "Search": #search for next that matches aiHypo
-      (mailId,email,aiHypo,huHypo) = self.m.getSearchMail(True,aiHypo) #forward search next AI email that matches hypo
-    else:  #Train mode - train current email and fetch random untrained emails
-      mailId,email,aiHypo,huHypo = self.m.getNextTrain() #get next email to train
-    return(mailId,email,aiHypo,huHypo) #view part of callback is here
+  #def prevCback(self): #move backward in emails
+  #  if mode == "Read": #get next in email list
+  #    (mailId,email,aiHypo,huHypo) = self.m.getReadMail(True) #forward read next email
+  #  elif mode == "Search": #search for next that matches aiHypo
+  #    (mailId,email,aiHypo,huHypo) = self.m.getSearchMail(True,aiHypo) #forward search next AI email that matches hypo
+  #  else:  #Train mode - train current email and fetch random untrained emails
+  #    #mailId,email,aiHypo,huHypo = self.m.getNextTrain() #get next email to train
+  #    mailId,email,aiHypo,huHypo = self.m.getPrevTrain() #get next email to train
+  #  return(mailId,email,aiHypo,huHypo) #view part of callback is here
 
   #def chgTrain(self,huHypo,conf):
   def chgTrain(self,huHypo):
@@ -70,8 +74,9 @@ class ctl():
     self.v.setVbacks(c)
 
     self.v.trainedLbl.setVal(self.m.trainCt) #set existing stats
-    trueFract = '{:6.3f}'.format(self.m.trainTrue/self.m.trainCt*100)
-    self.v.trueLbl.setVal(trueFract)
+    if self.m.trainCt != 0:
+      trueFract = '{:6.3f}'.format(self.m.trainTrue/self.m.trainCt*100)
+      self.v.trueLbl.setVal(trueFract)
     mailCt = self.m.mailCt
     self.v.mailCt.setVal(mailCt)
     trainGoal = int(mailCt*0.75)
@@ -116,6 +121,6 @@ v = view.view()
 m = model.model(sys.argv[1],aiSz) #infile json
 c = ctl(v,m)
 c.run(c)
-if dstfileNm != None: #save the results 
-  m.fileSv(dstfileNm)
+if outfile != None: #save the results 
+  m.fileSv(outfile)
 
