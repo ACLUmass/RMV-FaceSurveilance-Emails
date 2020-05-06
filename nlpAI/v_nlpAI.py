@@ -72,13 +72,15 @@ class view():
     self.errMargin = lblEntry(self.stats, 'err margin %',10)
     self.errMargin.lblFr.pack(side=TOP)
     self.aiConf = lblVal(self.stats, 'AI confidence %',10)
-    self.conf = lblEntry(self.stats, 'confidence %',10)
-    self.conf.lblFr.pack(side=TOP)
-    self.trainNeedLbl = lblVal(self.stats, 'train size',10)
-    self.trainedLbl = lblVal(self.stats, 'trained',10)
-    self.trueLbl = lblVal(self.stats, 'trained true',10)
+    self.spacer = Label(self.stats, height=4, text = "")
+    self.spacer.pack( side = TOP)
+    #self.conf = lblEntry(self.stats, 'confidence %',10)
+    #self.conf.lblFr.pack(side=TOP)
+    #self.trainNeedLbl = lblVal(self.stats, 'train size',10)
+    self.trainedLbl = lblVal(self.stats, 'trained size',10)
+    self.trueLbl = lblVal(self.stats, 'trained true %',10)
     self.mailCt = lblVal(self.stats, 'AI Size',10)
-    self.trueClass = lblVal(self.stats, 'AI true',10)
+    self.trueClass = lblVal(self.stats, 'AI true %',10)
     self.falsePos = lblVal(self.stats, 'bad AI true',10)
     self.falseNeg = lblVal(self.stats, 'bad AI false',10)
 
@@ -156,11 +158,12 @@ class view():
       else:
         tmp = 'True'
       self.huHypo.setVal(tmp)
-      trainCt,trainTrue,trainSz = self.c.chgTrain(tmp,self.conf.getVal())
+      #trainCt,trainTrue,trainSz = self.c.chgTrain(tmp,self.conf.getVal())
+      trainCt,trainTrue = self.c.chgTrain(tmp)
       self.trainedLbl.setVal(trainCt) #set training stats
       #self.aiConf.setVal(aiConf) #set training stats
       self.trueLbl.setVal(trainTrue)
-      self.trainNeedLbl.setVal(trainSz)
+      #self.trainNeedLbl.setVal(trainSz)
 
   def aiHypoVback(self):
     if self.mode['text'] == 'Search': #user change allowed because search is on aiHypo
@@ -170,9 +173,9 @@ class view():
       else:
         self.aiHypo.setVal('True')
 
-  def confVback(self,dummy): #dummy is the return character that we don't need
-    sz = self.c.trainSz(self.conf.getVal())
-    self.trainNeedLbl.setVal(int(sz))
+  #def confVback(self,dummy): #dummy is the return character that we don't need
+  #  sz = self.c.trainSz(self.conf.getVal())
+  #  self.trainNeedLbl.setVal(int(sz))
 
   def trGoalVback(self,dummy): #dummy is the return character that we don't need
     conf = self.c.trainConf(self.trainGoal.getVal(),self.errMargin.getVal())
@@ -224,7 +227,7 @@ class view():
     self.aiHypo.button.config(command = self.aiHypoVback)
     self.mode.config(command = self.modeVback)
     self.goto.bind('<Return>', self.getGoto)
-    self.conf.entry.bind('<Return>', self.confVback)
+    #self.conf.entry.bind('<Return>', self.confVback)
     self.runAI.config(command = self.runAIVback)
     self.next.config(command = self.nextVback)
     self.prev.config(command = self.prevVback)

@@ -33,10 +33,14 @@ class ctl():
       mailId,email,aiHypo,huHypo = self.m.getNextTrain() #get next email to train
     return(mailId,email,aiHypo,huHypo) #view part of callback is here
 
-  def chgTrain(self,huHypo,conf):
+  #def chgTrain(self,huHypo,conf):
+  def chgTrain(self,huHypo):
     trainCt,trainTrue = self.m.chgCurTrain(huHypo) #train current email
-    trainSz = int(self.trainSz(conf))
-    return(trainCt,trainTrue,trainSz)
+    #trainSz = int(self.trainSz(conf))
+    #return(trainCt,trainTrue,trainSz)
+    trueFract = '{:6.3f}'.format(trainTrue/trainCt*100)
+    #return(trainCt,trainTrue)
+    return(trainCt,trueFract)
 
   def gotoCback(self,gotoId): #dummy is the return character that we don't need
     return(self.m.getGotoMail(gotoId))
@@ -58,13 +62,16 @@ class ctl():
 
   def runAICback(self,errMargin):
     aiTrue,falsePos,falseNeg,aiOK = self.m.runAI(errMargin)
-    return(aiTrue,falsePos,falseNeg,aiOK)
+    trueFract = '{:6.3f}'.format(aiTrue/self.m.mailCt*100)
+    #return(aiTrue,falsePos,falseNeg,aiOK)
+    return(trueFract,falsePos,falseNeg,aiOK)
 
   def run(self,c):
     self.v.setVbacks(c)
 
     self.v.trainedLbl.setVal(self.m.trainCt) #set existing stats
-    self.v.trueLbl.setVal(self.m.trainTrue)
+    trueFract = '{:6.3f}'.format(self.m.trainTrue/self.m.trainCt*100)
+    self.v.trueLbl.setVal(trueFract)
     mailCt = self.m.mailCt
     self.v.mailCt.setVal(mailCt)
     trainGoal = int(mailCt*0.75)
@@ -74,10 +81,10 @@ class ctl():
     aiConf = '{:6.2f}'.format(stats.samConf(trainGoal,errMargin,0.5,mailCt)*100)
     self.v.aiConf.setVal(aiConf)
 
-    conf = 75
-    self.v.conf.setVal(conf)
-    sz = self.trainSz(conf)
-    self.v.trainNeedLbl.setVal(int(sz))
+    #conf = 75
+    #self.v.conf.setVal(conf)
+    #sz = self.trainSz(conf)
+    #self.v.trainNeedLbl.setVal(int(sz))
 
     (mailId,email,aiHypo,huHypo) = self.m.getReadMail(True) #point to first email to read
     self.v.aiHypo.setVal(aiHypo)
