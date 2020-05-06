@@ -60,8 +60,8 @@ class ctl():
   #  conf = '{:6.2f}'.format(stats.samConf(int(trainGoal),float(errMargin),0.5,self.m.mailCt)*100)
   #  return conf
 
-  def runAICback(self,errMargin):
-    aiTrue,falsePos,falseNeg,aiOK = self.m.runAI(errMargin)
+  def runAICback(self,errMargin,aiAlg):
+    aiTrue,falsePos,falseNeg,aiOK = self.m.runAI(errMargin,aiAlg)
     trueFract = '{:6.3f}'.format(aiTrue/self.m.mailCt*100)
     #return(aiTrue,falsePos,falseNeg,aiOK)
     return(trueFract,falsePos,falseNeg,aiOK)
