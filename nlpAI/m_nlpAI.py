@@ -160,7 +160,7 @@ class model():
     mailId,email =  self.formText(mail) #found it!
     return(mailId,email,mail['ai'],mail['train'])
 
-  def runAI(self,errMargin):
+  def runAI(self,errMargin,aiAlg):
     rawMail = []  #byte form of each email
     allBows = []  #byte representaton of all emails
 
@@ -187,7 +187,13 @@ class model():
         else:
           trainHypos.append(0)
 
-    allHypos = ai.rfa(trainSets,allSets,trainHypos)
+    if aiAlg == 'rfa':
+      allHypos = ai.rfa(trainSets,allSets,trainHypos)
+    elif aiAlg == 'svm':
+      allHypos = ai.svm(trainSets,allSets,trainHypos)
+    else:
+      allHypos = ai.nvb(trainSets,allSets,trainHypos)
+
     self.aiTrue = 0
     for i in range(self.mailCt): #create training sets
       if allHypos[i] == 1:

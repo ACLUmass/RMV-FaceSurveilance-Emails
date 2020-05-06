@@ -49,6 +49,21 @@ class lblButton():
       self.lblFr.config(bg='#ffffff')
       
 
+class aiAlgButton():
+  def __init__(self,root,label,wd):
+    self.lblFr = LabelFrame(root, text = label)
+    self.lblFr.pack(side=RIGHT)
+    self.button = Button(self.lblFr, width = wd)
+    self.button.pack(side = RIGHT)
+    self.lblFr.config(bg='#7f7fff')
+
+  def getVal(self):
+    return self.button['text']
+
+  def setVal(self,val):
+    self.button.config(text = val)
+      
+
 class view():
   def __init__(self): #setup everything without controller callbacks
     #layout the frames in the top window
@@ -66,6 +81,8 @@ class view():
     self.statsPad.pack(side = TOP)
     self.runAI = Button(self.stats, text = "runAI",width=10,height=2)
     self.runAI.pack(side = TOP)
+    self.aiAlg = aiAlgButton(self.stats, 'aiAlg', 10)
+    self.aiAlg.lblFr.pack(side = TOP)
     self.aiOK = lblVal(self.stats, 'AI OK',10)
     self.trainGoal = lblEntry(self.stats, 'train goal',10)
     self.trainGoal.lblFr.pack(side=TOP)
@@ -150,6 +167,16 @@ class view():
     else:
       self.mode.config(text = 'Read')
 
+  def aiAlgVback(self):
+    tmp = self.aiAlg.getVal()
+    if tmp == 'rfa':
+      self.aiAlg.setVal('svm')
+    elif tmp == 'svm':
+      self.aiAlg.setVal('nvb')
+    else:
+      self.aiAlg.setVal('rfa')
+
+
   def huHypoVback(self):
     if self.mode['text'] == 'Train': #user change allowed only in train mode
       tmp = self.huHypo.getVal()
@@ -207,7 +234,7 @@ class view():
       self.ldEmail(mailId,email)
 
   def runAIVback(self):
-    aiTrue,falsePos,falseNeg,aiOK = self.c.runAICback(float(self.errMargin.getVal()))
+    aiTrue,falsePos,falseNeg,aiOK = self.c.runAICback(float(self.errMargin.getVal()),self.aiAlg['text'])
     self.trueClass.setVal(aiTrue)
     self.falsePos.setVal(falsePos)
     self.falseNeg.setVal(falseNeg)
@@ -225,6 +252,7 @@ class view():
     self.c = c
     self.huHypo.button.config(command = self.huHypoVback)
     self.aiHypo.button.config(command = self.aiHypoVback)
+    self.aiAlg.button.config(command = self.aiAlgVback)
     self.mode.config(command = self.modeVback)
     self.goto.bind('<Return>', self.getGoto)
     #self.conf.entry.bind('<Return>', self.confVback)
@@ -233,4 +261,5 @@ class view():
     self.prev.config(command = self.prevVback)
     self.trainGoal.entry.bind('<Return>', self.trGoalVback)
     self.errMargin.entry.bind('<Return>', self.trGoalVback)
+    self.aiAlg.setVal('rfa')
 

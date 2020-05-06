@@ -117,7 +117,7 @@ def svm(X_train,X_test,y_train):
   return(y_pred)
 
 #++++++++++++===++++++++++++++++++++++++++++++++++++
-def nvBayes(X_train,X_test,y_train):
+def nvb(X_train,X_test,y_train):
   from sklearn import naive_bayes
   Naive = naive_bayes.MultinomialNB()
   Naive.fit(X_train,y_train)
