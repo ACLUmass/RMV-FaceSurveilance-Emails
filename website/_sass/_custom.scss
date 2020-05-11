@@ -1,0 +1,33 @@
+// Define email card style
+.email-card {
+    width: 100%;
+    display: inline-block;
+    overflow:hidden;
+//     flex-direction: row;
+}
+
+.mailNo {
+    width: 50px;
+//     padding: 2rem;
+//     vertical-align: middle;
+//     display: inline-block;
+//     float: left;
+//     padding: 1% !important;
+//     margin-right: 1rem;
+//     text-align: center;
+}
+
+#filter_button {
+    padding-left: 3rem;
+    padding-right: 3rem;
+//     text-align: center;
+}
+
+#email_container {
+    display: none;
+    width: 100%
+}
+
+#loading_anim {
+    text-align: center;
+}

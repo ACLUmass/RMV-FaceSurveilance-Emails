@@ -14,7 +14,7 @@ before_script:
   - ls data
   - mkdir website/_data
   - ls website
-  - cp data/allMails.json website/_data/
+  - cp data/nodupsMail.json website/_data/
   - cd website
   - bundle install
 

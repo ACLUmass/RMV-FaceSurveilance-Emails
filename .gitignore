@@ -20,5 +20,5 @@ data/src/*.csv
 # Website-related files
 website/_site/
 website/Gemfile.lock
-website/_data/allMails.json
+website/_data/nodupsMail.json
 website/.sass-cache
