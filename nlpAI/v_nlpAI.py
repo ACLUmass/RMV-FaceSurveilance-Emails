@@ -180,10 +180,12 @@ class view():
   def huHypoVback(self):
     if self.mode['text'] == 'Train': #user change allowed only in train mode
       tmp = self.huHypo.getVal()
-      if tmp == 'True':
+      if tmp == 'None':
         tmp = 'False'
-      else:
+      elif tmp == 'False':
         tmp = 'True'
+      else:
+        tmp = 'False'
       self.huHypo.setVal(tmp)
       #trainCt,trainTrue,trainSz = self.c.chgTrain(tmp,self.conf.getVal())
       trainCt,trainTrue = self.c.chgTrain(tmp)

@@ -103,13 +103,13 @@ aiSz = None
 try:
   tmp = sys.argv[2]
   if tmp[0] != '-':
-    dstFileNm = tmp
+    outfile = tmp
   else:
     aiSz = tmp[1:]
   try:
     tmp = sys.argv[3]
-    if tmp != '-':
-      dstFileNm = tmp
+    if tmp[0] != '-':
+      outfile = tmp
     else:
       aiSz = tmp[1:]
   except:

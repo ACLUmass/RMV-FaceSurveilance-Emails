@@ -88,6 +88,15 @@ def dateMatch(dateA,dateB):
   else:
     return False
 
+def mkClean(X): #clean junk from body
+  # Remove all the special characters
+  document = re.sub(r'\W', ' ', str(X))
+  document = re.sub(r'\\xa0', ' ', document)
+  # Converting to Lowercase
+  document = document.lower()
+  return document
+
+
 
 def dupEmail(emailA,emailB):
   dateA = emailA['date']
@@ -113,15 +122,35 @@ def dupEmail(emailA,emailB):
 def bodyMatch(bodyA,bodyB):
   if bodyA == None or bodyB  == None: #we don't have both bodies
     return False
-  tmpA = bodyA.strip()
-  tmpB = bodyB.strip()
-  if len(bodyA) == 0  or len(bodyB) == 0: #we don't have both dates
+  try:
+    tmpA = bodyA.strip()
+    tmpA = mkClean(tmpA)
+  except:
+    tmpA = ''
+  try:
+    tmpB = bodyB.strip()
+    tmpB = mkClean(tmpB)
+  except:
+    tmpB = ''
+  if len(tmpA) == 0  or len(tmpB) == 0: #we don't have both dates
     return False
-  ratio = fuzz.ratio(bodyA,bodyB)
-  if ratio > 50:
-    return True
+
+  wdsA = tmpA.split()
+  wdsB = tmpB.split()
+  if len(wdsA) == len(wdsB):
+    for i in range(len(wdsA)):
+      if wdsA[i] != wdsB[i]:
+        return False
+    else:
+      return True
   else:
     return False
+
+  #ratio = fuzz.ratio(tmpA,tmpB)
+  #if ratio > 90:
+  #  return True
+  #else:
+  #  return False
 
 inf = open(sys.argv[1], 'r')
 r = inf.read()  #read in all the bytes into one string
@@ -141,7 +170,7 @@ for i in range(mailTot-1):
     for j in range(i+1,end):
       tmp1 = mails[j]
       #if dateMatch(tmp['date'],tmp1['date']): #if dates match we consider it a match unless from: or to: contradict
-      if dupEmail(tmp,tmp1):
+      if dupEmail(tmp,tmp1) or bodyMatch(tmp['body'],tmp1['body']):
         dupIds.append(j)
         #tmpFrom = tmp['from']
         #tmp1From = tmp1['from']
