@@ -51,9 +51,19 @@ def mkBow(X): #make bag of words from each document
     document = document.lower()
     
     # Lemmatization
+
     document = document.split()
 
-    document = [stemmer.lemmatize(word) for word in document]
+    tmp1 = []
+    for word in document:
+      tag = get_wordnet_pos(word)
+      #tmp = stemmer.lemmatize(word, pos=tag) #doesn't improve results
+      tmp = stemmer.lemmatize(word)
+      if word != tmp:
+        print(word,tmp)
+      tmp1.append(tmp)
+ 
+    #document = [stemmer.lemmatize(word) for word in document]
     document = ' '.join(document)
 
     documents.append(document)
@@ -84,6 +94,7 @@ def mkSet(documents):
 #low frequency ones aren't useful. 
   from sklearn.feature_extraction.text import TfidfVectorizer
   tfidfconverter = TfidfVectorizer(max_features=1500, min_df=5, max_df=0.7, stop_words=stopwords.words('english'))
+  #tfidfconverter = TfidfVectorizer(sublinear_tf=True,max_features=1500, min_df=5, max_df=0.7, stop_words=stopwords.words('english'))
 #for each document count the frequency of each lemma and return it as a 2D matrix. This is a normalized frequency from 0 to 1 weighted by the
 #inverse number of documents each term occurs in. The purpose is to lower the impact of terms that occur in lots of documents  
 
@@ -104,6 +115,7 @@ def rfa(X_train,X_test,y_train):
   from sklearn.ensemble import RandomForestClassifier
 #https://stackabuse.com/random-forest-algorithm-with-python-and-scikit-learn/
   classifier = RandomForestClassifier(n_estimators=1000, random_state=0)
+  #classifier = RandomForestClassifier(n_estimators=2000, random_state=0)
   classifier.fit(X_train, y_train) #train the classifier 
   y_pred = classifier.predict(X_test) #generate the True/False matrix for the test set
   return(y_pred)
@@ -117,7 +129,7 @@ def svm(X_train,X_test,y_train):
   return(y_pred)
 
 #++++++++++++===++++++++++++++++++++++++++++++++++++
-def nvBayes(X_train,X_test,y_train):
+def nvb(X_train,X_test,y_train):
   from sklearn import naive_bayes
   Naive = naive_bayes.MultinomialNB()
   Naive.fit(X_train,y_train)

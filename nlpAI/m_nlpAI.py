@@ -21,9 +21,9 @@ class model():
     r = inf.read()  #read in all the bytes into one string
     self.mails = json.loads(r)
     self.idx = None 
-    if aiSz == None:
+    if aiSz == None: #use full input file for ai
       self.mailCt = len(self.mails)
-    else:
+    else: #command line specified ai size
       self.mailCt = int(aiSz)
     self.trainCt = 0
     self.trainTrue = 0
@@ -34,16 +34,27 @@ class model():
     for i in range(self.mailCt):
       if not 'ai' in self.mails[i]:
         self.mails[i]['ai'] = 'None'
-      if 'train' in self.mails[i]:
-        self.trainCt += 1
-        if self.mails[i]['train'] == 'True':
-          self.trainTrue += 1
-      else:
+
+      try: #see if this is a new file
+        training = self.mails[i]['train']
+        if training != 'None' :
+          self.trainCt += 1
+          if training == 'True' :
+            self.trainTrue += 1
+      except: #new file so add the training variable as None
         self.mails[i]['train'] = 'None'
+
+      #if 'train' in self.mails[i]:
+      #  self.trainCt += 1
+      #  if self.mails[i]['train'] == 'True':
+      #    self.trainTrue += 1
+      #else:
+      #  self.mails[i]['train'] = 'None'
 
   def fileSv(self,fileNm): #save the results
     with open(fileNm, 'w') as f:
-      json.dump(self.mails, f)
+      #json.dump(self.mails, f)
+      json.dump(self.mails[0:self.mailCt], f)
 
 
   def formText(self,mail):
@@ -88,7 +99,7 @@ class model():
   #add training to current email and fetch a new random one to train
   def getNextTrain(self):
     if self.trainCt == self.mailCt: #nothing left to train
-      return('none','all trained','None')
+      return('none','all trained','None','None')
     self.trains.append(self.idx) #put current idx on list for going in reverse
     while True: #find a mail that has not been trained already
       self.idx = random.randint(0,self.mailCt - 1) 
@@ -103,12 +114,12 @@ class model():
   def getPrevTrain(self):
     if len(self.trains) == 0: #walked all the way back
       self.idx = None
-      return('none','all the way back','')
+      return('none','all the way back','None','None')
     self.idx = self.trains.pop()
 
     mail = self.mails[self.idx]
     mailId,email =  self.formText(mail)
-    return(mailId,email,mail['train'])
+    return(mailId,email,mail['ai'],mail['train'])
 
   #get next or previous email linearly plus its current AI state
   def getReadMail(self,fwd):
@@ -148,6 +159,17 @@ class model():
     return(mailId,email,aiHypo,huHypo)
 
 
+  #get trained
+  def saveTrained(self,fileNm):
+    trained = []
+    for i in range(self.mailCt):
+      mail =  self.mails[i]
+      if mail['train'] != 'None':
+        trained.append(mail)
+    with open(fileNm, 'w') as f:
+      json.dump(trained, f)
+
+    
   #goto a mailId
   def getGotoMail(self,gotoId):
     for self.idx in range(0,self.mailCt): #search from the beginning
@@ -160,7 +182,7 @@ class model():
     mailId,email =  self.formText(mail) #found it!
     return(mailId,email,mail['ai'],mail['train'])
 
-  def runAI(self):
+  def runAI(self,errMargin,aiAlg):
     rawMail = []  #byte form of each email
     allBows = []  #byte representaton of all emails
 
@@ -171,6 +193,10 @@ class model():
       tmp = email.encode('UTF-8')
       rawMail.append(tmp)
     allBows = ai.mkBow(rawMail)  #turn raw mail into bag of words
+
+    for i in range(len(allBows)):
+      print('==========')
+      print(allBows[i])
 
 
     allSets = ai.mkSet(allBows)
@@ -187,7 +213,13 @@ class model():
         else:
           trainHypos.append(0)
 
-    allHypos = ai.rfa(trainSets,allSets,trainHypos)
+    if aiAlg == 'rfa':
+      allHypos = ai.rfa(trainSets,allSets,trainHypos)
+    elif aiAlg == 'svm':
+      allHypos = ai.svm(trainSets,allSets,trainHypos)
+    else:
+      allHypos = ai.nvb(trainSets,allSets,trainHypos)
+
     self.aiTrue = 0
     for i in range(self.mailCt): #create training sets
       if allHypos[i] == 1:
@@ -209,4 +241,9 @@ class model():
           else:
             self.falseNeg += 1
 
-    return(self.aiTrue,self.falsePos,self.falseNeg)      
+    if abs((self.trainTrue/self.trainCt) - self.aiTrue/self.mailCt) > errMargin:
+      aiOK = False
+    else:
+      aiOK = True
+
+    return(self.aiTrue,self.falsePos,self.falseNeg,aiOK)      
