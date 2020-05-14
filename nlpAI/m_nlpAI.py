@@ -21,9 +21,9 @@ class model():
     r = inf.read()  #read in all the bytes into one string
     self.mails = json.loads(r)
     self.idx = None 
-    if aiSz == None:
+    if aiSz == None: #use full input file for ai
       self.mailCt = len(self.mails)
-    else:
+    else: #command line specified ai size
       self.mailCt = int(aiSz)
     self.trainCt = 0
     self.trainTrue = 0
@@ -34,16 +34,27 @@ class model():
     for i in range(self.mailCt):
       if not 'ai' in self.mails[i]:
         self.mails[i]['ai'] = 'None'
-      if 'train' in self.mails[i]:
-        self.trainCt += 1
-        if self.mails[i]['train'] == 'True':
-          self.trainTrue += 1
-      else:
+
+      try: #see if this is a new file
+        training = self.mails[i]['train']
+        if training != 'None' :
+          self.trainCt += 1
+          if training == 'True' :
+            self.trainTrue += 1
+      except: #new file so add the training variable as None
         self.mails[i]['train'] = 'None'
+
+      #if 'train' in self.mails[i]:
+      #  self.trainCt += 1
+      #  if self.mails[i]['train'] == 'True':
+      #    self.trainTrue += 1
+      #else:
+      #  self.mails[i]['train'] = 'None'
 
   def fileSv(self,fileNm): #save the results
     with open(fileNm, 'w') as f:
-      json.dump(self.mails, f)
+      #json.dump(self.mails, f)
+      json.dump(self.mails[0:self.mailCt], f)
 
 
   def formText(self,mail):
@@ -148,6 +159,17 @@ class model():
     return(mailId,email,aiHypo,huHypo)
 
 
+  #get trained
+  def saveTrained(self,fileNm):
+    trained = []
+    for i in range(self.mailCt):
+      mail =  self.mails[i]
+      if mail['train'] != 'None':
+        trained.append(mail)
+    with open(fileNm, 'w') as f:
+      json.dump(trained, f)
+
+    
   #goto a mailId
   def getGotoMail(self,gotoId):
     for self.idx in range(0,self.mailCt): #search from the beginning
@@ -171,6 +193,10 @@ class model():
       tmp = email.encode('UTF-8')
       rawMail.append(tmp)
     allBows = ai.mkBow(rawMail)  #turn raw mail into bag of words
+
+    for i in range(len(allBows)):
+      print('==========')
+      print(allBows[i])
 
 
     allSets = ai.mkSet(allBows)
