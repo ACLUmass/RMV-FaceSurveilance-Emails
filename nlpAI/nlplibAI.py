@@ -62,9 +62,10 @@ def mkBow(X): #make bag of words from each document
       if word != tmp:
         print(word,tmp)
       tmp1.append(tmp)
+    document = ' '.join(tmp1)
  
     #document = [stemmer.lemmatize(word) for word in document]
-    document = ' '.join(document)
+    #document = ' '.join(document)
 
     documents.append(document)
 
@@ -93,8 +94,8 @@ def mkSet(documents):
 #that occur in over 70% of the documents because those are not useful for discrimination. Finally, limit us 1500 unique lemmas because low
 #low frequency ones aren't useful. 
   from sklearn.feature_extraction.text import TfidfVectorizer
-  tfidfconverter = TfidfVectorizer(max_features=1500, min_df=5, max_df=0.7, stop_words=stopwords.words('english'))
-  #tfidfconverter = TfidfVectorizer(sublinear_tf=True,max_features=1500, min_df=5, max_df=0.7, stop_words=stopwords.words('english'))
+  #tfidfconverter = TfidfVectorizer(max_features=1500, min_df=5, max_df=0.7, stop_words=stopwords.words('english'))
+  tfidfconverter = TfidfVectorizer(sublinear_tf=True,max_features=6, min_df=2, max_df=0.95, stop_words=stopwords.words('english'))
 #for each document count the frequency of each lemma and return it as a 2D matrix. This is a normalized frequency from 0 to 1 weighted by the
 #inverse number of documents each term occurs in. The purpose is to lower the impact of terms that occur in lots of documents  
 
