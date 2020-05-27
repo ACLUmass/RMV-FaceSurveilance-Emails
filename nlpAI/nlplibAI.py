@@ -59,8 +59,8 @@ def mkBow(X): #make bag of words from each document
       tag = get_wordnet_pos(word)
       #tmp = stemmer.lemmatize(word, pos=tag) #doesn't improve results
       tmp = stemmer.lemmatize(word)
-      if word != tmp:
-        print(word,tmp)
+      #if word != tmp:
+      #  print(word,tmp)
       tmp1.append(tmp)
     document = ' '.join(tmp1)
  

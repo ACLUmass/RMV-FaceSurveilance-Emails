@@ -194,9 +194,9 @@ class model():
       #rawMail.append(mail['from'])
     allBows = ai.mkBow(rawMail)  #turn raw mail into bag of words
 
-    for i in range(len(allBows)):
-      print('==========')
-      print(allBows[i])
+    #for i in range(len(allBows)):
+    #  print('==========')
+    #  print(allBows[i])
 
 
     allSets = ai.mkSet(allBows)
