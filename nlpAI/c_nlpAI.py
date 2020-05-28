@@ -57,7 +57,8 @@ class ctl():
     return stats.samSz(int(conf)/100.0,tmp,self.m.mailCt)
 
   def trainConf(self,trainGoal,errMargin):
-    aiConf = '{:6.2f}'.format(stats.samConf(int(trainGoal),float(errMargin),0.5,self.m.mailCt)*100)
+    #aiConf = '{:6.2f}'.format(stats.samConf(int(trainGoal),float(errMargin),0.5,self.m.mailCt)*100)
+    aiConf = '{:6.2f}'.format(stats.samConf(int(trainGoal),float(errMargin)/100.0,0.5,self.m.mailCt)*100)
     return aiConf
 
   #def errMargin(self,trainGoal,errMargin):
@@ -81,7 +82,8 @@ class ctl():
     self.v.mailCt.setVal(mailCt)
     trainGoal = int(mailCt*0.75)
     self.v.trainGoal.setVal(trainGoal)
-    errMargin = 0.05
+    #errMargin = 0.05
+    errMargin = 5
     self.v.errMargin.setVal(errMargin)
     aiConf = '{:6.2f}'.format(stats.samConf(trainGoal,errMargin,0.5,mailCt)*100)
     self.v.aiConf.setVal(aiConf)

@@ -17,7 +17,8 @@ import nlplibAI as ai
 class model():
   def __init__(self,fileNm,aiSz): #setup everything without controller callbacks
     #build a database of all the emails with images
-    inf = open(fileNm, 'r')
+    #inf = open(fileNm, 'r')
+    inf = open(fileNm, 'r', encoding='utf-8')
     r = inf.read()  #read in all the bytes into one string
     self.mails = json.loads(r)
     self.idx = None 
@@ -189,14 +190,13 @@ class model():
     for i in range(self.mailCt): #create email list
       mail = self.mails[i]
       mailId,email =  self.formText(mail) #convert to byte form
-      email = email.replace(u'\xa0', u' ') #replace nonbreaking space with a real one
-      tmp = email.encode('UTF-8')
-      rawMail.append(tmp)
+      rawMail.append(email)
+      #rawMail.append(mail['from'])
     allBows = ai.mkBow(rawMail)  #turn raw mail into bag of words
 
-    for i in range(len(allBows)):
-      print('==========')
-      print(allBows[i])
+    #for i in range(len(allBows)):
+    #  print('==========')
+    #  print(allBows[i])
 
 
     allSets = ai.mkSet(allBows)
@@ -205,7 +205,8 @@ class model():
     trainPtrs = []   #pointer for training set into test set
     for i in range(self.mailCt): #create training sets
       mail = self.mails[i]
-      if 'train' in mail.keys(): #copy the training set
+      #if 'train' in mail.keys(): #copy the training set
+      if mail['train'] != 'None': #copy the training set
         trainSets.append(allSets[i])
         trainPtrs.append(i)
         if mail['train'] == 'True':
