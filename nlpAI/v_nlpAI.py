@@ -122,7 +122,8 @@ class view():
     self.ctlsPad = Frame(self.ctls,width=5)
     self.ctlsPad.pack(side = RIGHT)
 
-    self.mode = Button(self.ctls, text = 'Read', width=6, height=2)
+    #self.mode = Button(self.ctls, text = 'Read', width=6, height=2,fg='#ff0000')
+    self.mode = Button(self.ctls, text = 'Read', width=6, height=2,highlightbackground='#ff7f7f',highlightthickness=10)
     self.mode.pack(side = RIGHT)
 
     self.prev = Button(self.ctls, text = "Prev", height=2)
@@ -137,14 +138,14 @@ class view():
     self.aiHypo = lblButton(self.ctls, 'ai',6)
     self.aiHypo.lblFr.pack(side=RIGHT)
 
-    self.hypoDsc = Entry(self.ctls, bd = 5)
+    self.hypoDsc = Entry(self.ctls, bd = 5,width=23)
     self.hypoDsc.pack(side = RIGHT)
     self.L1 = Label(self.ctls, text = "Hypo")
     self.L1.pack( side = RIGHT)
 
     self.L2 = Label(self.ctls, text = "Goto")
     self.L2.pack( side = LEFT)
-    self.goto = Entry(self.ctls, bd = 5, width=15)
+    self.goto = Entry(self.ctls, bd = 5, width=12)
     self.goto.pack(side = LEFT)
 
 ##all other stuff
@@ -161,11 +162,11 @@ class view():
   def modeVback(self):
     tmp = self.mode['text']
     if tmp == 'Read':
-      self.mode.config(text = 'Search')
+      self.mode.config(text = 'Search',highlightbackground='#7f7fff',highlightthickness=10)
     elif tmp == 'Search':
-      self.mode.config(text = 'Train')
+      self.mode.config(text = 'Train',highlightbackground='#7fff7f',highlightthickness=10)
     else:
-      self.mode.config(text = 'Read')
+      self.mode.config(text = 'Read',highlightbackground='#ff7f7f',highlightthickness=10)
 
   def aiAlgVback(self):
     tmp = self.aiAlg.getVal()
