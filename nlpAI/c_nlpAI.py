@@ -100,29 +100,33 @@ class ctl():
     self.v.run() #run the tkinter loop
 
 #create the view object first because it will be needed in callbacks
-outfile = None
-aiSz = None
-try:
-  tmp = sys.argv[2]
-  if tmp[0] != '-':
-    outfile = tmp
-  else:
-    aiSz = tmp[1:]
-  try:
-    tmp = sys.argv[3]
-    if tmp[0] != '-':
-      outfile = tmp
-    else:
-      aiSz = tmp[1:]
-  except:
-    pass
-except:
-  pass
-
-v = view.view()
-m = model.model(sys.argv[1],aiSz) #infile json
-c = ctl(v,m)
-c.run(c)
-if outfile != None: #save the results 
-  m.fileSv(outfile)
-
+#outfile = None
+#aiSz = None
+#try:
+#  tmp = sys.argv[2]
+#  if tmp[0] != '-':
+#    outfile = tmp
+#  else:
+#    aiSz = tmp[1:]
+#  try:
+#    tmp = sys.argv[3]
+#    if tmp[0] != '-':
+#      outfile = tmp
+#    else:
+#      aiSz = tmp[1:]
+#  except:
+#    pass
+#except:
+#  pass
+#
+#inf = open(sys.argv[1], 'r', encoding='utf-8')
+#r = inf.read()  #read in all the bytes into one string
+#m = model.model(r,aiSz) #infile json
+# 
+#v = view.view()
+##m = model.model(sys.argv[1],aiSz) #infile json
+#c = ctl(v,m)
+#c.run(c)
+#if outfile != None: #save the results 
+#  m.fileSv(outfile)
+#

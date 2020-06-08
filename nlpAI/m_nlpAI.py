@@ -18,9 +18,10 @@ class model():
   def __init__(self,fileNm,aiSz): #setup everything without controller callbacks
     #build a database of all the emails with images
     #inf = open(fileNm, 'r')
-    inf = open(fileNm, 'r', encoding='utf-8')
-    r = inf.read()  #read in all the bytes into one string
-    self.mails = json.loads(r)
+    #inf = open(fileNm, 'r', encoding='utf-8')
+    #r = inf.read()  #read in all the bytes into one string
+    #self.mails = json.loads(r)
+    self.mails = json.loads(fileNm)
     self.idx = None 
     if aiSz == None: #use full input file for ai
       self.mailCt = len(self.mails)
