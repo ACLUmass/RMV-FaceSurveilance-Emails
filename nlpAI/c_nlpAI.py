@@ -6,8 +6,8 @@
 #dstFileNm = write the results of training and testing if sys.arv[2] exists. Overwrites srcFileNm if same.
 import sys
 import statsLib as stats
-import v_nlpAI as view
-import m_nlpAI as model
+#import v_nlpAI as view
+#import m_nlpAI as model
 
 class ctl():
   def __init__(self,view,model):
@@ -58,6 +58,7 @@ class ctl():
 
   def trainConf(self,trainGoal,errMargin):
     #aiConf = '{:6.2f}'.format(stats.samConf(int(trainGoal),float(errMargin),0.5,self.m.mailCt)*100)
+    self.m.mailCt = 2912
     aiConf = '{:6.2f}'.format(stats.samConf(int(trainGoal),float(errMargin)/100.0,0.5,self.m.mailCt)*100)
     return aiConf
 
@@ -72,21 +73,24 @@ class ctl():
     return(trueFract,falsePos,falseNeg,aiOK)
 
   def run(self,c):
-    self.v.setVbacks(c)
+    #self.v.setVbacks(c)
 
-    self.v.trainedLbl.setVal(self.m.trainCt) #set existing stats
-    if self.m.trainCt != 0:
-      trueFract = '{:6.3f}'.format(self.m.trainTrue/self.m.trainCt*100)
-      self.v.trueLbl.setVal(trueFract)
+    #self.v.trainedLbl.setVal(self.m.trainCt) #set existing stats
+    #if self.m.trainCt != 0:
+    #  trueFract = '{:6.3f}'.format(self.m.trainTrue/self.m.trainCt*100)
+    #  self.v.trueLbl.setVal(trueFract)
+    initVals = {}
     mailCt = self.m.mailCt
-    self.v.mailCt.setVal(mailCt)
+    initVals['mailCt'] = mailCt
+    #self.v.mailCt.setVal(mailCt)
     trainGoal = int(mailCt*0.75)
-    self.v.trainGoal.setVal(trainGoal)
-    #errMargin = 0.05
+    initVals['trainGoal'] = trainGoal
+    #self.v.trainGoal.setVal(trainGoal)
     errMargin = 5
-    self.v.errMargin.setVal(errMargin)
-    aiConf = '{:6.2f}'.format(stats.samConf(trainGoal,errMargin,0.5,mailCt)*100)
-    self.v.aiConf.setVal(aiConf)
+    initVals['errMargin'] = errMargin
+    #self.v.errMargin.setVal(errMargin)
+    initVals['aiConf'] = '{:6.2f}'.format(stats.samConf(trainGoal,errMargin,0.5,mailCt)*100)
+    #self.v.aiConf.setVal(aiConf)
 
     #conf = 75
     #self.v.conf.setVal(conf)
@@ -94,39 +98,42 @@ class ctl():
     #self.v.trainNeedLbl.setVal(int(sz))
 
     (mailId,email,aiHypo,huHypo) = self.m.getReadMail(True) #point to first email to read
-    self.v.aiHypo.setVal(aiHypo)
-    self.v.huHypo.setVal(huHypo)
-    self.v.ldEmail(mailId,email) #view part of callback is here
-    self.v.run() #run the tkinter loop
+    print('dbg2',aiHypo,huHypo,mailId,email)
+    initVals['mailId'] = mailId
+    initVals['email'] = email
+    initVals['aiHypo'] = aiHypo
+    initVals['huHypo'] = huHypo
+    #self.v.aiHypo.setVal(aiHypo)
+    #self.v.huHypo.setVal(huHypo)
+    #self.v.ldEmail(mailId,email) #view part of callback is here
+    #self.v.run() #run the tkinter loop
+    return initVals
 
 #create the view object first because it will be needed in callbacks
-#outfile = None
-#aiSz = None
-#try:
-#  tmp = sys.argv[2]
-#  if tmp[0] != '-':
-#    outfile = tmp
-#  else:
-#    aiSz = tmp[1:]
-#  try:
-#    tmp = sys.argv[3]
-#    if tmp[0] != '-':
-#      outfile = tmp
-#    else:
-#      aiSz = tmp[1:]
-#  except:
-#    pass
-#except:
-#  pass
-#
-#inf = open(sys.argv[1], 'r', encoding='utf-8')
-#r = inf.read()  #read in all the bytes into one string
-#m = model.model(r,aiSz) #infile json
-# 
+outfile = None
+aiSz = None
+try:
+  tmp = sys.argv[2]
+  if tmp[0] != '-':
+    outfile = tmp
+  else:
+    aiSz = tmp[1:]
+  try:
+    tmp = sys.argv[3]
+    if tmp[0] != '-':
+      outfile = tmp
+    else:
+      aiSz = tmp[1:]
+  except:
+    pass
+except:
+  pass
+
 #v = view.view()
-##m = model.model(sys.argv[1],aiSz) #infile json
+#m = model.model(sys.argv[1],aiSz) #infile json
+#m = model.model('rfa150.json',100) #infile json
 #c = ctl(v,m)
 #c.run(c)
 #if outfile != None: #save the results 
 #  m.fileSv(outfile)
-#
+
