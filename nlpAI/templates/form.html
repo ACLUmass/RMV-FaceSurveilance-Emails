@@ -1,0 +1,200 @@
+<html>
+  <head>
+    <title>Email AI Classifier</title>
+   <link rel="stylesheet" type="text/css" href="/static/style.css">
+
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+  </head>
+  <body>
+    <script console.log("dbg0");></script>
+    <div id="container">
+      <div class="pagetitle">
+        <h3>Email AI Classifier</h3>
+      </div>
+      <div class="row" id="main">
+        <!-- <div class="column"> -->
+        <div style="width: 120px; float:left">
+          <button class="button " onclick="runAI()">runAI</button><br />
+          <label for="aiOK">AI OK</label>
+          <br />
+          <input autocomplete="off" id="aiOK"  type="text" name="aiOK" size="5px"><br />
+          <label for="aiAlg">aiAlg</label><br /> 
+          <input type="button" id="aiAlg" onclick=" aiAlg()" value="rfa"><br />
+          <label for="trainGoal"  >train goal</label> <br />
+          <input autocomplete="off" id="trainGoal" onchange="trainGoal()" type="text" name="trainGoal" size="5px"> <br />
+          <label for="errMargin">err margin %</label><br /> 
+          <input autocomplete="off" id="errMargin"  type="text" name="errMargin" size="5px"><br />
+          <label for="aiConf">AI confidence %</label> <br />
+          <input autocomplete="off" id="aiConf"  type="text" name="aiConf" size="5px"><br />
+          <br />
+          <hr >
+          <label for="trainedSz">trained size</label> <br />
+          <input autocomplete="off" id="trainedSz"  type="text" name="trainedSz" size="5px"><br />
+          <label for="trainedTrue">trained true %</label> <br />
+          <input autocomplete="off" id="trainedTrue"  type="text" name="trainedTrue" size="5px"><br />
+          <label for="aiSz">ai size</label> <br />
+          <input autocomplete="off" id="aiSz"  type="text" name="aiSz" size="5px"><br />
+          <label for="aiTrue">ai true %</label> <br />
+          <input autocomplete="off" id="aiTrue"  type="text" name="aiTrue" size="5px"><br />
+          <label for="badTrue"> bad ai true %</label> <br />
+          <input autocomplete="off" id="badTrue"  type="text" name="badTrue" size="5px"><br />
+          <label for="badFalse"> bad ai false %</label> <br />
+          <input autocomplete="off" id="badFalse"  type="text" name="badFalse" size="5px"><br />
+        </div>
+        <div style="width: 540px; margin-left: 130px">
+          <label for="mailId" id="mailId" ></label><br />
+          <div id="email" style="height:450px;width:650px;border:1px solid #ccc;font:16px/26px Georgia, Garamond, Serif;overflow:auto;">
+As you can see, once there's enough text in this box, the box will grow scroll bars... that's why we call it a scroll box! You could also place an image into the scroll box.
+          </div>
+        </div>
+      </div>
+      <div>
+        <br />
+        <div class="column">
+          <label for="goto">GoTo</label><br />
+          <input autocomplete="off" id="goto"  type="text" name="goto" size="15px">
+        </div>
+        <div class="column">
+          <label for="hypo">Hypo</label><br \>
+          <input autocomplete="off" id="hypo"  type="text" name="hypo" size="30px">
+        </div>
+        <div class="column">
+          <label for="aiHypo">ai Hypo</label><br /> 
+          <input type="button" id="aiHypo" onclick=" aiHypo()" value="    ">
+        </div>
+        <div class="column">
+          <label for="huHypoLabel">human Hypo</label><br /> 
+          <input type="button" id="huHypo" onclick=" huHypo()" value="    ">
+        </div>
+        <div class="column">
+          <button class="button" onclick="next()">Next</button>
+        </div>
+        <div class="column">
+          <button class="button" onclick="prev()">Prev</button>
+        </div>
+        <div class="column">
+          <button class="button" id="mode" onclick="mode()">Read</button>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+
+<script>
+
+//Stuff to do on init
+$.get("/initView",
+  function(data) {
+    var w = $.parseJSON(data);
+    document.getElementById("aiSz").value = w["mailCt"];
+    document.getElementById("trainGoal").value = w["trainGoal"];
+    document.getElementById("errMargin").value = w["errMargin"];
+    document.getElementById("aiConf").value = w["aiConf"];
+    console.log("dbg1",w["aiHypo"],w["huHypo"],w["mailId"],w["email"]);
+    document.getElementById("mailId").innerText = w["mailId"];
+    document.getElementById("email").innerText = w["email"];
+    document.getElementById("aiHypo").value = w["aiHypo"];
+    document.getElementById("huHypo").value = w["huHypo"];
+  }
+)
+.fail(function(e){
+  //console.log(e.responseText);
+  alert(e.responseText);
+});
+
+//lookup the sen & rep info for the address in the url parameters
+function trainGoal() {
+  var z = document.getElementById("trainGoal").value;
+  $.get("/getpythondata",{zipcode:"",city:"",address:z},
+    function(data) {
+      var w = $.parseJSON(data);
+      document.getElementById("aiConf").value = w["Representative"];
+    }
+  )
+  .fail(function(e){
+    //console.log(e.responseText);
+    alert(e.responseText);
+  });
+}
+//clear everything in the form except apreadsheet name
+function  mode(){
+  var x = document.getElementById("mode").innerText;
+  if(x == "Read"){
+    document.getElementById("mode").innerText = "Search";
+  }
+  else if(x == "Search"){
+    document.getElementById("mode").innerText = "Train";
+  }
+  else{
+    document.getElementById("mode").innerText = "Read";
+  }
+}
+
+function  aiAlg(){
+  var x = document.getElementById("aiAlg").value;
+  if(x == "rfa"){
+    document.getElementById("aiAlg").value = "sva";
+  }
+  else if(x == "sva"){
+    document.getElementById("aiAlg").value = "nvb";
+  }
+  else{
+    document.getElementById("aiAlg").value = "rfa";
+  }
+}
+
+function  aiHypo(){
+  var x = document.getElementById("aiHypo").value;
+  if(x == "false"){
+    document.getElementById("aiHypo").value = "true";
+  }
+  else{
+    document.getElementById("aiHypo").value = "false";
+  }
+}
+
+function  huHypo(){
+  var x = document.getElementById("huHypo").value;
+  if(x == "false"){
+    document.getElementById("huHypo").value = "true";
+  }
+  else{
+    document.getElementById("huHypo").value = "false";
+  }
+}
+
+//send all the data to the spreadsheet
+function runAI(){
+  document.getElementById("aiOK").value = "pass";
+}
+
+function next(){
+}
+
+function prev(){
+}
+
+function shutDown() {
+  $.post( "/shutDown",{
+    javascript_data: JSON.stringify('dummy')
+  });
+ 
+}
+
+/*
+//open up a spreadsheet
+function mySheet(){ //not used
+  var x = document.getElementById("spreadSheet").value;
+  console.log(JSON.stringify(x));
+  var msg = {'sheet':x};
+  $.post( "/gsOpen", {
+    javascript_data: JSON.stringify(msg)
+  });
+  document.getElementById("zipcode").focus();
+}
+*/
+
+</script>
+
+

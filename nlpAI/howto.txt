@@ -1,0 +1,43 @@
+#basic flask tutorial
+https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-i-hello-world
+http://microblog-251311.appspot.com/form
+http://flask-app-251314.appspot.com/form
+https://cloud.google.com/appengine/docs/standard/python/getting-started/python-standard-env
+https://console.cloud.google.com/cloud-resource-manager?_ga=2.113605888.-605917134.1564879951&_gac=1.19456970.1566998430.CjwKCAjwzJjrBRBvEiwA867bys87OFeJHcNaYTqY1nwJzkT6Ra3v5zXBkHWCPL97BAgw1S30xA6achoCxS4QAvD_BwE
+https://cloud.google.com/sdk/docs/downloads-interactive
+https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/
+https://toolbelt.readthedocs.io/en/latest/adapters.html#appengineadapter
+https://www.datacamp.com/community/tutorials/fuzzy-string-python
+https://medium.com/jash-data-sciences/fuzzy-string-matching-with-python-overview-40759d57c06
+https://www.scrapehero.com/how-to-parse-unstructured-addresses-using-python-and-google-geocoding-api/
+
+requirements
+------------
+- a local directory for code and local testing
+- a service on google appengine for remote deployment
+
+
+virtual environment
+===================
+> virtualenv env  #one time at init
+> source env/bin/activate
+
+deploy to existing appengine
+============================
+pip freeze > requirements.txt
+gcloud app deploy --project postcard-251716
+gcloud app browse --project=postcard-251716
+browser> https://postcard-251716.appspot.com/
+
+local simulation python 3
+================
+source env/bin/activate
+export FLASK_APP=main
+flask run
+127.0.0.1:5000 #in chrome
+
+local simulation python 2
+================
+dev_appserver.py app.yaml
+hppttps://cloud.google.com/appengine/docs/standard/python/quickstart
+in browser tab - http://localhost:8080
