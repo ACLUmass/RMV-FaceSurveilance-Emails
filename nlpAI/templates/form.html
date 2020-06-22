@@ -53,7 +53,7 @@ As you can see, once there's enough text in this box, the box will grow scroll b
         <br />
         <div class="column">
           <label for="goto">GoTo</label><br />
-          <input autocomplete="off" id="goto"  type="text" name="goto" size="15px">
+          <input autocomplete="off" id="goto" onchange="getGoTo()"  type="text" name="goto" size="15px">
         </div>
         <div class="column">
           <label for="hypo">Hypo</label><br \>
@@ -104,6 +104,25 @@ $.get("/initView",
 });
 
 //lookup the sen & rep info for the address in the url parameters
+function getGoTo() {
+  var z = document.getElementById("goto").value;
+  $.get("/getGoTo",{"goto":z},
+    function(data) {
+      var w = $.parseJSON(data);
+      console.log("dbg2",w);
+      document.getElementById("mailId").innerText = w[0];
+      document.getElementById("email").innerText = w[1];
+      document.getElementById("aiHypo").value = w[2];
+      document.getElementById("huHypo").value = w[3];
+    }
+  )
+  .fail(function(e){
+    //console.log(e.responseText);
+    alert(e.responseText);
+  });
+}
+
+//lookup the sen & rep info for the address in the url parameters
 function trainGoal() {
   var z = document.getElementById("trainGoal").value;
   $.get("/getpythondata",{zipcode:"",city:"",address:z},
@@ -117,6 +136,7 @@ function trainGoal() {
     alert(e.responseText);
   });
 }
+
 //clear everything in the form except apreadsheet name
 function  mode(){
   var x = document.getElementById("mode").innerText;

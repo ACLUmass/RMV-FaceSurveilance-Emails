@@ -97,7 +97,6 @@ def submitted_form():
 #lookup the address in malegislature.gov
 @app.route('/initView')
 def init_view():
-  print('dbg0')
   mailCt = c.run(None)
   return json.dumps(mailCt)
 
@@ -105,42 +104,25 @@ def init_view():
 @app.route('/getpythondata')
 def get_python_data():
     global c
-    #addr_parser = StreetAddressParser()
-    #tmp = addr_parser.parse(request.args.get('address'))
     tmp = request.args.get('address')
-    #print 'dbg1',tmp
-
-    #if tmp['house'] and tmp['street_full']: #create a full address for legislature lookup
-    #  fullAdr = ' '.join([tmp['house'],tmp['street_full']])
-    #elif tmp['street_full']:
-    #  fullAdr = tmp['street_full']
-    #else:
-    #  fullAdr = ''
-
-    #aiConf = '{:6.2f}'.format(stats.samConf(int(trainGoal),float(errMargin)/100.0,0.5,self.m.mailCt)*100)
-    #aiConf = '{:6.2f}'.format(stats.samConf(int(tmp),0.05,0.5,5000))
     aiConf = c.trainConf(int(tmp),5)
 
   
-    #adr = [fullAdr,request.args.get('city'),request.args.get('zipcode')]
-    #print 'dbg2',adr
     senRep = {}
     senRep['route'] = 'hello'
     senRep['route2'] = 'world'
     senRep['Senator'] = 'me'
     senRep['Representative'] = aiConf
     return json.dumps(senRep)
-    #for tries in range(5):
-    #  response = lkupLib.lkupLeg(adr) #returns none if retries fail
-    #  if response != None: #got something from website, scrape it and return
-    #    senRep = lkupLib.legScrape(response)
-    #    if len(senRep) > 1: #lookup worked, calculate route code
-    #      senRep['route'],senRep['route2'] = lkupLib.mkRoute(senRep)
-    #    else: #lookup failed. return list of guesses
-    #      #print 'dbg3',request.args.get('zipcode'),tmp['street_full']
-    #      senRep['guesses'] = mkGuess(request.args.get('zipcode'),tmp['street_full'])
-    #    return json.dumps(senRep)
-    #return 'MA Legislature Website Down - Hit Clear and try again later', status.HTTP_404_NOT_FOUND
+
+
+@app.route('/getGoTo')
+def getGoTo():
+    global c
+    tmp = request.args.get('goto')
+    email = c.gotoCback(tmp)
+    print('dbg0',email)
+    return json.dumps(email)
 
 def getMin(best):
   minIdx = 0
