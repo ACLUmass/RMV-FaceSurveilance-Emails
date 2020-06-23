@@ -22,9 +22,9 @@
           <label for="aiAlg">aiAlg</label><br /> 
           <input type="button" id="aiAlg" onclick=" aiAlg()" value="rfa"><br />
           <label for="trainGoal"  >train goal</label> <br />
-          <input autocomplete="off" id="trainGoal" onchange="trainGoal()" type="text" name="trainGoal" size="5px"> <br />
+          <input autocomplete="off" id="trainGoal" onchange="aiConf()" type="text" name="trainGoal" size="5px"> <br />
           <label for="errMargin">err margin %</label><br /> 
-          <input autocomplete="off" id="errMargin"  type="text" name="errMargin" size="5px"><br />
+          <input autocomplete="off" id="errMargin" onchange="aiConf()"  type="text" name="errMargin" size="5px"><br />
           <label for="aiConf">AI confidence %</label> <br />
           <input autocomplete="off" id="aiConf"  type="text" name="aiConf" size="5px"><br />
           <br />
@@ -123,12 +123,13 @@ function getGoTo() {
 }
 
 //lookup the sen & rep info for the address in the url parameters
-function trainGoal() {
+function aiConf() {
+  var y = document.getElementById("errMargin").value;
   var z = document.getElementById("trainGoal").value;
-  $.get("/getpythondata",{zipcode:"",city:"",address:z},
+  $.get("/aiConf",{errMargin:y,trainGoal:z},
     function(data) {
       var w = $.parseJSON(data);
-      document.getElementById("aiConf").value = w["Representative"];
+      document.getElementById("aiConf").value = w;
     }
   )
   .fail(function(e){
@@ -136,6 +137,7 @@ function trainGoal() {
     alert(e.responseText);
   });
 }
+
 
 //clear everything in the form except apreadsheet name
 function  mode(){
@@ -190,9 +192,41 @@ function runAI(){
 }
 
 function next(){
+  var x = document.getElementById("mode").innerText;
+  var y = document.getElementById("aiHypo").value;
+  var z = Boolean(true);
+  $.get("/nextEmail",{fwd:z,mode:x,aiHypo:y},
+    function(data) {
+      var w = $.parseJSON(data);
+      document.getElementById("mailId").innerText = w[0];
+      document.getElementById("email").innerText = w[1];
+      document.getElementById("aiHypo").value = w[2];
+      document.getElementById("huHypo").value = w[3];
+    }
+  )
+  .fail(function(e){
+    //console.log(e.responseText);
+    alert(e.responseText);
+  });
 }
 
 function prev(){
+  var x = document.getElementById("mode").innerText;
+  var y = document.getElementById("aiHypo").value;
+  var z = Boolean(false);
+  $.get("/nextEmail",{fwd:z,mode:x,aiHypo:y},
+    function(data) {
+      var w = $.parseJSON(data);
+      document.getElementById("mailId").innerText = w[0];
+      document.getElementById("email").innerText = w[1];
+      document.getElementById("aiHypo").value = w[2];
+      document.getElementById("huHypo").value = w[3];
+    }
+  )
+  .fail(function(e){
+    //console.log(e.responseText);
+    alert(e.responseText);
+  });
 }
 
 function shutDown() {

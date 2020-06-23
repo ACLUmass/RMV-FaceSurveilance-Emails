@@ -101,19 +101,13 @@ def init_view():
   return json.dumps(mailCt)
 
 
-@app.route('/getpythondata')
-def get_python_data():
+@app.route('/aiConf')
+def aiConf():
     global c
-    tmp = request.args.get('address')
-    aiConf = c.trainConf(int(tmp),5)
-
-  
-    senRep = {}
-    senRep['route'] = 'hello'
-    senRep['route2'] = 'world'
-    senRep['Senator'] = 'me'
-    senRep['Representative'] = aiConf
-    return json.dumps(senRep)
+    errMargin = request.args.get('errMargin')
+    trainGoal = request.args.get('trainGoal')
+    aiConf = c.trainConf(int(trainGoal),int(errMargin))
+    return json.dumps(aiConf)
 
 
 @app.route('/getGoTo')
@@ -122,6 +116,20 @@ def getGoTo():
     tmp = request.args.get('goto')
     email = c.gotoCback(tmp)
     print('dbg0',email)
+    return json.dumps(email)
+
+
+@app.route('/nextEmail')
+def nextEmail():
+    global c
+    if request.args.get('fwd') == 'true':  #javascipt booleans don't match python
+      x = True
+    else:
+      x = False
+    y = request.args.get('mode')
+    z = request.args.get('aiHypo')
+    email = c.nextCback(x,y,z)
+    print('dbg3',x,y,z,email)
     return json.dumps(email)
 
 def getMin(best):

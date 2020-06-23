@@ -27,17 +27,6 @@ class ctl():
         mailId,email,aiHypo,huHypo = self.m.getPrevTrain() #get previous email to train
     return(mailId,email,aiHypo,huHypo) #view part of callback is here
 
-  #def prevCback(self): #move backward in emails
-  #  if mode == "Read": #get next in email list
-  #    (mailId,email,aiHypo,huHypo) = self.m.getReadMail(True) #forward read next email
-  #  elif mode == "Search": #search for next that matches aiHypo
-  #    (mailId,email,aiHypo,huHypo) = self.m.getSearchMail(True,aiHypo) #forward search next AI email that matches hypo
-  #  else:  #Train mode - train current email and fetch random untrained emails
-  #    #mailId,email,aiHypo,huHypo = self.m.getNextTrain() #get next email to train
-  #    mailId,email,aiHypo,huHypo = self.m.getPrevTrain() #get next email to train
-  #  return(mailId,email,aiHypo,huHypo) #view part of callback is here
-
-  #def chgTrain(self,huHypo,conf):
   def chgTrain(self,huHypo):
     trainCt,trainTrue = self.m.chgCurTrain(huHypo) #train current email
     #trainSz = int(self.trainSz(conf))
@@ -57,14 +46,9 @@ class ctl():
     return stats.samSz(int(conf)/100.0,tmp,self.m.mailCt)
 
   def trainConf(self,trainGoal,errMargin):
-    #aiConf = '{:6.2f}'.format(stats.samConf(int(trainGoal),float(errMargin),0.5,self.m.mailCt)*100)
     self.m.mailCt = 2912
     aiConf = '{:6.2f}'.format(stats.samConf(int(trainGoal),float(errMargin)/100.0,0.5,self.m.mailCt)*100)
     return aiConf
-
-  #def errMargin(self,trainGoal,errMargin):
-  #  conf = '{:6.2f}'.format(stats.samConf(int(trainGoal),float(errMargin),0.5,self.m.mailCt)*100)
-  #  return conf
 
   def runAICback(self,errMargin,aiAlg):
     aiTrue,falsePos,falseNeg,aiOK = self.m.runAI(errMargin,aiAlg)
