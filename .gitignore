@@ -22,3 +22,4 @@ website/_site/
 website/Gemfile.lock
 website/_data/nodupsMail.json
 website/.sass-cache
+.Rproj.user
