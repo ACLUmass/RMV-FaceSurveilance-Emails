@@ -12,14 +12,12 @@ env
 
 # aarons sandbox
 ab_sandbox
+old_data
 
 # until I hear otherwise, I don't want to store RMV source files in a repo
 data/src/*.pdf
 data/src/*.csv
 
-# Website-related files
-website/_site/
-website/Gemfile.lock
-website/_data/nodupsMail.json
-website/.sass-cache
+# R-related files
 .Rproj.user
+*.Rproj
