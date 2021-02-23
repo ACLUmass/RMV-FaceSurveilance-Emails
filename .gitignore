@@ -24,3 +24,5 @@ data/src/*.csv
 # R-related files
 .Rproj.user
 *.Rproj
+.RData
+.Rhistory
