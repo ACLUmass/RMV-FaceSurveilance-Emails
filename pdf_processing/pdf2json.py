@@ -1,12 +1,15 @@
+from datetime import datetime
 import sys
 import re
 import json
 import pdfplumber
 from tabulate import tabulate
 
+from parse_email_date import convert_date
 
 #usage in python3 environment
-# python pdf2json.py mailList.json allMails.json >mailDbg.txt
+# (Should be run from within pdf_processing/)
+# python pdf2json.py ../data/src/mailList.json ../data/src/allMails.json >mailDbg.txt
 
 #sys.argv[1] is a json file of all the email pdfs
 #[['year','filename'],....]
@@ -14,7 +17,6 @@ from tabulate import tabulate
 
 #sys.argv[2] is the json file to create contining all the emails as text
 #mailDbg.txt is debugging print statements
-
 
 fromCt = 0
 pageCt = 0
@@ -49,10 +51,11 @@ def pdf2txt(filename):
   return doc
 
 #make an email record from the single text string of that email
-def mkMailRec(mailNo,mailId,txt):
+def mkMailRec(mailNo,mailId,txt, mailURL):
   email = {}
   email['mailNo'] = mailNo #useful for debugger breakpoints
   email['mailId'] = mailId #useful for locating email in pdf
+  email['mailURL'] = mailURL
   lines = txt.splitlines() 
   #for key in ['from','to','date','sent','cc']:
   #for key in ['from','to','date','cc']:
@@ -62,6 +65,7 @@ def mkMailRec(mailNo,mailId,txt):
       if key == 'date': 
         chk = re.match('>*\s*' + key + ':',lines[i],re.IGNORECASE)
         chk = re.match('>*\s*(date|sent):',lines[i],re.IGNORECASE)
+
       elif key == 'attach': 
         chk = re.match('>*\s*attach\w*:',lines[i],re.IGNORECASE)
       else:
@@ -78,6 +82,15 @@ def mkMailRec(mailNo,mailId,txt):
           line = ' '.join(lines[i:j])
           email[key] = line[keyEnd:] 
           del lines[i:j]
+
+        elif key == "date":
+          line = lines.pop(i)[keyEnd:]
+          try:
+            email[key] = convert_date(line)
+          except:
+            print("couldn't match date " + line)
+            email[key] = None
+
         else:
           line = lines.pop(i)
           email[key] = line[keyEnd:]
@@ -87,7 +100,7 @@ def mkMailRec(mailNo,mailId,txt):
       email[key] = None
 
   if len(lines) > 0: #what's left is the body
-    email['body'] = ' '.join(lines)
+    email['body'] = '\n'.join(lines)
   else:
     email['body'] =  None
 
@@ -96,7 +109,7 @@ def mkMailRec(mailNo,mailId,txt):
 
   #case msp3_163_4,5 and others. Multiple fields appear on same line with From:
   if email['date'] == None:  #can't split this email into lines
-    email = mkOneLine(mailNo,mailId,txt) #TODO - not perfect. because of mailto: I'm not testing for To:
+    email = mkOneLine(mailNo,mailId,txt, mailURL) #TODO - not perfect. because of mailto: I'm not testing for To:
  
   #msp3_242_2 and ones like it can't be fixed because somebody retyped the info without the identifying header stuff
   #msp3 all other missing fields have been redacted or heading has been omitted
@@ -110,10 +123,11 @@ def mkMailRec(mailNo,mailId,txt):
 
       
 #make an email record from the single text string of that email
-def mkOneLine(mailNo,mailId,txt):
+def mkOneLine(mailNo,mailId,txt, mailURL):
   email = {}
   email['mailNo'] = mailNo #useful for debugger breakpoints
   email['mailId'] = mailId #useful for locating email in pdf
+  email['mailURL'] = mailURL
   hdrlocs = []
   hdrlocs.append((re.search('^From:',txt,re.IGNORECASE).span(),'from')) #these 3 must exist or the email is malformed
 
@@ -121,12 +135,15 @@ def mkOneLine(mailNo,mailId,txt):
   email['cc'] = None
   email['body'] = None
   email['date'] = None
+
   tmp = re.search('Date:|Sent:',txt,re.IGNORECASE)
   if tmp:
     hdrlocs.append((tmp.span(),'date'))
+
   tmp = re.search('[^l]To:',txt,re.IGNORECASE)
   if tmp:
     hdrlocs.append((tmp.span(),'to'))
+
   tmp = re.search('Cc:',txt,re.IGNORECASE)
   if tmp:
     hdrlocs.append((tmp.span(),'cc'))
@@ -139,12 +156,15 @@ def mkOneLine(mailNo,mailId,txt):
       datEnd = hdrlocs[i+1][0][0] #text ends before the next key
     else:
       datEnd = len(txt) #all the rest of the text
+
     email[key] = txt[datBeg:datEnd]
+
 
   #It gets a little tricky here because the email body still has to be separated from the last header parameter
   #I think return is always a separator but I'm not 100% sure.
-  key = hdrlocs[-1][1]  #last header
-  tmp = re.search('\n',email[key],re.IGNORECASE)
+  key = hdrlocs[-1][1]  #last header=
+  tmp = re.search('\n',email[key],re.IGNORECASE) if email[key] else None
+
   if tmp:
     div = tmp.span()[1]
     email['body'] = email[key][div:] #everything after the match
@@ -153,6 +173,12 @@ def mkOneLine(mailNo,mailId,txt):
   if re.search('.+\n.+',email['from']) != None: #TODO - check why I can't do this on every line
     tmp1 = email['from']
     email['from'] = tmp1.replace('\n',' ')
+
+  try:
+    email["date"] = convert_date(email["date"])
+  except:
+    print(email["date"])
+    email["date"] = None
 
   return email
  
@@ -173,6 +199,8 @@ pdfs = json.loads(r)
 for pdf in pdfs: #go thru each pdf in the list
   srcId = pdf[0]   #which rmv pdf this text came from
   txt = pdf2txt(pdf[1] + '.pdf') #convert the pdf to text
+
+  print(srcId)
 
   #these stats are for debugging quick checks
   pageCt = 0 #should equal last page number in pdf
@@ -221,6 +249,38 @@ for pdf in pdfs: #go thru each pdf in the list
     mailId = srcId + '_' + str(brkIdx + 1) + '_' + str(frId) #adobe reader page numbering starts at 1   
     maillocs.append((mailId,frlocs[i]))
 
+  mail_urls = {
+    "msp1": "https://data.aclum.org/wp-content/uploads/2021/02/C-stateagencies/C11-dot-frt/documents/Emails/Law%20Enforcement%20Requests/All%20MSP%20Emails%20(Responsive)_Part1%20-%20FINAL%20II_Redacted.pdf",
+    "msp2": "https://data.aclum.org/wp-content/uploads/2021/02/C-stateagencies/C11-dot-frt/documents/Emails/Law%20Enforcement%20Requests/All%20MSP%20Emails%20(Responsive)_Part2%20-%20FINAL%20II_Redacted.pdf",
+    "msp3": "https://data.aclum.org/wp-content/uploads/2021/02/C-stateagencies/C11-dot-frt/documents/Emails/Law%20Enforcement%20Requests/All%20MSP%20Emails%20(Responsive)_Part3%20-%20Final%20II_Redacted.pdf",
+    "msp4": "https://data.aclum.org/wp-content/uploads/2021/02/C-stateagencies/C11-dot-frt/documents/Emails/Law%20Enforcement%20Requests/All%20MSP%20Emails%20(Responsive)_Part4%20-%20FINAL%20II_Redacted.pdf",
+    "msp5": "https://data.aclum.org/wp-content/uploads/2021/02/C-stateagencies/C11-dot-frt/documents/Emails/Law%20Enforcement%20Requests/All%20MSP%20Emails%20(Responsive)_Part5%20-%20FINAL%20II_Redacted%20(1).pdf",
+    "msp6": "https://data.aclum.org/wp-content/uploads/2021/02/C-stateagencies/C11-dot-frt/documents/Emails/Law%20Enforcement%20Requests/All%20MSP%20Emails%20(Responsive)_Part6%20-%20FINAL%20II_Redacted%20(1).pdf",
+    "msp7": "https://data.aclum.org/wp-content/uploads/2021/02/C-stateagencies/C11-dot-frt/documents/Emails/Law%20Enforcement%20Requests/All%20MSP%20Emails%20(Responsive)_Part7%20-%20FINAL%20II_Redacted.pdf",
+    "msp8": "https://data.aclum.org/wp-content/uploads/2021/02/C-stateagencies/C11-dot-frt/documents/Emails/Law%20Enforcement%20Requests/All%20MSP%20Emails%20(Responsive)_Part8%20-%20FINAL%20II_Redacted.pdf",
+    "fr1": "https://data.aclum.org/wp-content/uploads/2021/02/C-stateagencies/C11-dot-frt/documents/Emails/Face%20Recognition/FR%20Emails-%20Search%201_Redacted.pdf",
+    "fr2": "https://data.aclum.org/wp-content/uploads/2021/02/C-stateagencies/C11-dot-frt/documents/Emails/Face%20Recognition/FR%20Emails-%20Search%202_Redacted.pdf",
+    "fr3": "https://data.aclum.org/wp-content/uploads/2021/02/C-stateagencies/C11-dot-frt/documents/Emails/Face%20Recognition/FR%20Emails-%20Search%203_Redacted.pdf",
+    "fr4": "https://data.aclum.org/wp-content/uploads/2021/02/C-stateagencies/C11-dot-frt/documents/Emails/Face%20Recognition/FR%20Emails-%20Search%204_Redacted.pdf",
+    "fr5": "https://data.aclum.org/wp-content/uploads/2021/02/C-stateagencies/C11-dot-frt/documents/Emails/Face%20Recognition/FR%20Emails-%20Search%205_Redacted.pdf",
+    "fr6": "https://data.aclum.org/wp-content/uploads/2021/02/C-stateagencies/C11-dot-frt/documents/Emails/Face%20Recognition/FR%20Emails-%20Search%206_Redacted.pdf",
+    "fr7": "https://data.aclum.org/wp-content/uploads/2021/02/C-stateagencies/C11-dot-frt/documents/Emails/Face%20Recognition/FR%20Emails-%20Search%207_Redacted.pdf",
+    "fr8": "https://data.aclum.org/wp-content/uploads/2021/02/C-stateagencies/C11-dot-frt/documents/Emails/Face%20Recognition/FR%20Emails-%20Search%208_Redacted.pdf",
+    "fr9": "https://data.aclum.org/wp-content/uploads/2021/02/C-stateagencies/C11-dot-frt/documents/Emails/Face%20Recognition/FR%20Emails-%20Search%209_Redacted.pdf",
+    "fr10": "https://data.aclum.org/wp-content/uploads/2021/02/C-stateagencies/C11-dot-frt/documents/Emails/Face%20Recognition/FR%20Emails-%20Search%2010_Redacted.pdf",
+    "fr11": "https://data.aclum.org/wp-content/uploads/2021/02/C-stateagencies/C11-dot-frt/documents/Emails/Face%20Recognition/FR%20Emails-%20Search%2011_Redacted.pdf",
+    "fr12": "https://data.aclum.org/wp-content/uploads/2021/02/C-stateagencies/C11-dot-frt/documents/Emails/Face%20Recognition/FR%20Emails-%20Search%2012_Redacted.pdf",
+    "fr13": "https://data.aclum.org/wp-content/uploads/2021/02/C-stateagencies/C11-dot-frt/documents/Emails/Face%20Recognition/FR%20Emails-%20Search%2013_Redacted.pdf",
+    "fr14": "https://data.aclum.org/wp-content/uploads/2021/02/C-stateagencies/C11-dot-frt/documents/Emails/Face%20Recognition/FR%20Emails-%20Search%2014_Redacted.pdf",
+    "fr15": "https://data.aclum.org/wp-content/uploads/2021/02/C-stateagencies/C11-dot-frt/documents/Emails/Face%20Recognition/FR%20Emails-%20Search%2015_Redacted.pdf",
+    "fr16": "https://data.aclum.org/wp-content/uploads/2021/02/C-stateagencies/C11-dot-frt/documents/Emails/Face%20Recognition/FR%20Emails-%20Search%2016.pdf",
+    "fr17": "https://data.aclum.org/wp-content/uploads/2021/02/C-stateagencies/C11-dot-frt/documents/Emails/Face%20Recognition/FR%20Emails-%20Search%2017_Redacted.pdf",
+    "fr18": "https://data.aclum.org/wp-content/uploads/2021/02/C-stateagencies/C11-dot-frt/documents/Emails/Face%20Recognition/FR%20Emails-%20Search%2018_Redacted.pdf",
+    "fr19": "https://data.aclum.org/wp-content/uploads/2021/02/C-stateagencies/C11-dot-frt/documents/Emails/Face%20Recognition/FR%20Emails-%20Search%2019_Redacted.pdf",
+    "samp1": "https://data.aclum.org/wp-content/uploads/2021/02/C-stateagencies/C11-dot-frt/documents/Emails/ACLU%20Sample%20Search%20(no%20attachments)%20Batch%201_Redacted.pdf",
+    "samp2": "https://data.aclum.org/wp-content/uploads/2021/02/C-stateagencies/C11-dot-frt/documents/Emails/ACLU%20Sample%20Search%20(no%20attachments)%20Batch%202%20--%20Redacted.pdf"
+  }
+
   #now we can create a record for each email from that single big text string
   mails = []
   for i in range(len(maillocs)):
@@ -231,8 +291,12 @@ for pdf in pdfs: #go thru each pdf in the list
       mailEnd = len(txt)
     mailCt += 1
     mailNo += 1
+
+    # match mailID to URL
+    mailURL = mail_urls[mailId.split("_")[0]] + "#page=" + mailId.split("_")[1]
+
     #mails.append(mkMailRec(mailCt,mailId,txt[mailBeg:mailEnd]))
-    mails.append(mkMailRec(mailNo,mailId,txt[mailBeg:mailEnd]))
+    mails.append(mkMailRec(mailNo,mailId,txt[mailBeg:mailEnd], mailURL))
 
   mailTot.extend(mails)
   #dbgInfo.append((str(srcId),mailCt,pageCt))
