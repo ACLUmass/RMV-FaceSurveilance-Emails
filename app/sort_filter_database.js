@@ -17,9 +17,12 @@ function filter_emails() {
 
     // Determine whether or not to display each thumbnail
     var num_emails_displayed = 0;
+    var email_page = 0;
+    email_data = {0: []};
 
-    for (i = 1; i <= emails.length; i++) {
-        var email  = document.getElementById("card" + i)
+    for (i = 0; i <= all_data.length - 1; i++) {
+
+        var email = all_data[i]["card_html"];
 
         if (!email) {
             console.error("We've got an issue with card", i)
@@ -43,24 +46,39 @@ function filter_emails() {
 
         // Evaluate if the "date" text matches the search
         let email_date = Date.parse(email.getAttribute('date'))
-
-        // if (email.getAttribute('date').length < 5) {
-        //     console.log(email.getAttribute('date'))
-        //     console.log(email_date)
-        //     console.log(isNaN(email_date))
-        // }
-        
         let date_match = isNaN(email_date) | (email_date <= date_end_search & email_date >= date_start_search)
 
-        // console.log(email, from_match, to_match, cc_match, subj_body_match)
-
+        // If all criteria match; add to email_data list
         if (from_match & to_match & cc_match & subj_body_match & date_match) {
-            email.style.display = "inline-block";
             num_emails_displayed++;
-        } else {
-            email.style.display = "none";
-        }
+
+            email_data[email_page].push(i)
+
+            if (num_emails_displayed >= 50) {
+                email_page++;
+                email_data[email_page] = [];
+            }
+        } 
     };
+
+
+    var total_pages = Math.floor(num_emails_displayed/50)
+
+    // Update pagination 
+    $('#pagination-nav').pagination({
+        pages: total_pages,
+        displayedPages: 7,
+        ellipsePageSet: false,
+        cssStyle: '',
+        prevText: '<span aria-hidden="true">&laquo;</span>',
+        nextText: '<span aria-hidden="true">&raquo;</span>',
+        onPageClick: function (page, evt) {
+            showCards();
+        }
+    });
+
+    // Update the cards
+    showCards();
 
     // If there are no proposals to display, tell the user
     if (num_emails_displayed == 0) {
@@ -69,18 +87,4 @@ function filter_emails() {
         document.getElementById("no_emails_msg").style.display = 'none';
     };
 
-    // Update the count of how many emails are being shown
-    document.getElementById('n_emails_showing').innerHTML = num_emails_displayed;
 };
-
-
-// function get_n_emails_loaded() {
-//     // Find all email elements
-//     var incidents = document.getElementsByClassName("card_div");
-//     console.log("number of incidents: ", incidents.length)
-
-//     // Update the count of how many emails are being shown
-//     document.getElementById('n_incidents_showing').innerHTML = incidents.length;
-// };
-
-

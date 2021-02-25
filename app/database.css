@@ -112,16 +112,22 @@ h1 {
 }
 
 .card-header {
-	/*background-color: rgb(215, 77, 81);*/
+	background-color: white;
     text-align: left;
     text-transform: uppercase;
     font-family: 'gtam';
     font-weight: bold;
     font-size: 1.4rem;
     padding: 0px;
-    padding-left: 1rem;
+    padding-left: 1.25rem;
     /*color: white;*/
     min-height: 34px;
+    border-bottom: none;
+    margin-top: 1rem;
+}
+
+.card-body {
+  padding-top: 0px;
 }
 
 .card-title {
@@ -144,15 +150,14 @@ h1 {
 	margin-left: auto;
 	display: block;
 	border-radius: 0px;
-    font-weight: 700;
-    display: inline-block;
-	/*background-color: #00acee;*/
-	/*border-color: #00acee;*/
-    color: white !important;
-    margin-top: -30px;
-    font-size: .9rem;
+  font-weight: 700;
+  display: inline-block;
+  /*background-color: #00acee;*/
+  /*border-color: #00acee;*/
+  color: white !important;
+  margin-top: -30px;
+  font-size: .9rem;
 }
-
 
 .email-description {
 	margin-top: 1rem;
@@ -163,11 +168,16 @@ h1 {
 	padding:0px;
 }
 
-#filter_button {
+.cards-container {
+  width:100%;
+  margin-top: 3rem;
+}
+
+.btn {
 	margin: .5px;
-    font-size: 1rem;
-    background-color: #0055aa;
-    border-color: #0055aa;
+  font-size: 1rem;
+  background-color: #0055aa;
+  border-color: #0055aa;
 }
 
 .search-card {
@@ -210,4 +220,13 @@ h1 {
 .note i {
   margin-right: .5rem;
   font-size: 1rem;
+}
+
+#email_n_msg {
+  float:right; 
+  display:inline;
+}
+
+#pagination-nav {
+  display:inline;
 }

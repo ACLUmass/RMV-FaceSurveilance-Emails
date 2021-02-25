@@ -17,6 +17,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js" integrity="sha512-rKFvwjvE4liWPlFnvH4ZhRDfNZ9FOpdkD/BU5gAIA3VS3vOQrQ5BjKgbO3kxebKhHdHcNUHLqxQYSoxee9UwgA==" crossorigin="anonymous"></script>
     <!-- Load FontAwesome -->
     <script src="https://kit.fontawesome.com/7fb5d02cd4.js" crossorigin="anonymous"></script>
+    <!-- Load simplePagination -->
+    <script src="jquery.simplePagination.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="simplePagination.css" />
     <!-- Load custom CSS -->
     <link rel="stylesheet" href="database.css" />
     <link rel="stylesheet" href="sticky-footer.css" />
@@ -53,6 +56,7 @@
         <br>
         <div class="card search-card">
             <h5 class="card-title" style="font-size: 1.5rem;">Search by:</h5>
+            <form id="search_form">
             <div class="input-group mb-3">
                 <div class="input-group-prepend">
                     <span class="input-group-text" id="basic-addon1">From</span>
@@ -87,30 +91,30 @@
                 </div>
                 <input type="datetime-local" id="start_search_box" value="2014-01-01T00:00">
                 <input type="datetime-local" id="end_search_box" value="2019-12-31T00:00">
+                <a onclick="reset_dates();" class="btn btn-primary" tabindex="-1" role="button" aria-disabled="true" id="reset_button">
+                    Reset Dates
+                </a>
 
             </div>
+            </form>
 
             <div align="center">
                 <a onclick="filter_emails();" class="btn btn-primary" tabindex="-1" role="button" aria-disabled="true" id="filter_button">
                     Filter
                 </a>
+
+                <a onclick="reset_filters();" class="btn btn-primary" tabindex="-1" role="button" aria-disabled="true" id="reset_button">
+                    Reset
+                </a>
             </div>
         </div>
         <hr>
 
-        <!-- <nav aria-label="Page navigation example">
-          <ul class="pagination">
-            <li class="page-item"><a class="page-link" href="#">Previous</a></li>
-            <li class="page-item"><a class="page-link" href="#">1</a></li>
-            <li class="page-item"><a class="page-link" href="#">2</a></li>
-            <li class="page-item"><a class="page-link" href="#">3</a></li>
-            <li class="page-item"><a class="page-link" href="#">Next</a></li>
-          </ul>
-        </nav> -->
+        <!-- Add pagination control -->
+        <ul id="pagination-nav" class="pagination"></ul>
 
-        <ul id="pagination-demo" class="pagination-sm"></ul>
-
-        <p align="right">Showing <a id="n_emails_showing">...</a>/<span id="total_n_emails">...</span> emails</p>
+        <!-- Message showing how many results -->
+        <p id="email_n_msg">Showing <a id="n_emails_showing">...</a>/<span id="total_n_emails">...</span> emails</p>
 
         <div class="cards-container row"></div>
         <a id="no_emails_msg" style='display: none; text-align: center; font-style: italic;'>
@@ -120,6 +124,7 @@
 
 
     <div id="footer">
+        <hr>
         <div align="center">
             <a href="https://www.aclum.org/" target="_blank">
                 <img src="img/Logo_CMYK_Massachusetts_Massachusetts.png" height="50px" style="display: inline; margin: 10px;">

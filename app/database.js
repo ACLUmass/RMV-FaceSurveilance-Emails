@@ -4,6 +4,8 @@ var all_data;
 var i_email = 1;
 var email_pages;
 
+var card_container = document.getElementsByClassName("cards-container")[0]
+
 function load_data() {
     // return $.getJSON("nodupsMail.json", function(json) {
     return $.getJSON("allMails.json", function(json) {    
@@ -15,39 +17,8 @@ load_data()
     .then(() => {
         console.log("data loaded", all_data)
         createCards(all_data)
+        showCards(init=true)
     })
-
-// var years = [];
-// var cities = [];
-
-// function addPaginate() {
-
-//     $(document).ready(function() {
-//           $('.cards-container').before('<div id="nav" class="text-center"></div>');
-//           var rowsShown = 50;
-//           var rowsTotal = $('.card_div').length;
-//           var numPages = rowsTotal / rowsShown;
-//           for (i = 0; i < numPages; i++) {
-//             var pageNum = i + 1;
-//             $('#nav').append('<a href="#" class="btn-outline-info" rel="' + i + '">&emsp;' + pageNum + '&emsp;</a> ');
-//           }
-//           $('.card_div').hide();
-//           $('.card_div').slice(0, rowsShown).show();
-//           $('#nav a:first').addClass('active');
-//           $('#nav a').bind('click', function(e) {
-//             e.preventDefault();
-//             $('#nav a').removeClass('active');
-//             $(this).addClass('active');
-//             var currPage = $(this).attr('rel');
-//             var startItem = currPage * rowsShown;
-//             var endItem = startItem + rowsShown;
-//             $('.card_div').css('opacity', '0').hide().slice(startItem, endItem).
-//             css('display', 'flex').animate({
-//               opacity: 1
-//             }, 300);
-//           });
-//         });
-// }
 
 function createCards(all_data) {
 
@@ -58,21 +29,12 @@ function createCards(all_data) {
 
     console.log("number of emails?", all_data.length)
 
-    card_container = document.getElementsByClassName("cards-container")[0]
-
     // Add cards for all emails
     for (email in all_data) {
-        // console.log(email)
 
         email_data = all_data[email]
 
         let id = email_data.mailId
-
-        // years.push(year)
-
-        // cities.push(incident_data.City)
-
-        // console.log(incident_data.IncidentDate.slice(incident_data.IncidentDate.length - 4))
 
         let to = (email_data.to?email_data.to:'')
         let from = (email_data.from?email_data.from:'')
@@ -111,47 +73,72 @@ function createCards(all_data) {
 				  </div>
 				`
 
-        // card_div.setAttribute("year", incident_data.IncidentDate.slice(id.length - 4))
-
+        // Add card HTML to all_data list
         all_data[email]['card_html'] = card_div
-
-        // card_container.appendChild(card_div)
         i_email += 1
-
-
     }
 
-    console.log("out of loop")
+}
 
-    // // Do years now	
-    // years.sort();
-    // years = ["All"].concat(years)
-    // years_set = new Set(years)
+function showCards(init=false) {
+    console.log("running showCards")
 
-    // years_set.forEach(function(y) {
-    //     o = document.createElement("option")
-    //     o.innerHTML = y
-    //     document.getElementById("year_select").appendChild(o)
-    // })
+    if (init) {
+        total_pages = 221;
 
-    // // And cities
-    // cities.sort();
-    // cities = ["All"].concat(cities)
-    // cities_set = new Set(cities)
+        email_data = {};
+        for(i = 0; i < total_pages; i++) {
 
-    // cities_set.forEach(function(c) {
-    //     o = document.createElement("option")
-    //     o.innerHTML = c
-    //     document.getElementById("city_select").appendChild(o)
-    // })
+            email_data[i] = [];
 
-    // Count all incidents// Find all email elements
-    let emails = document.getElementsByClassName("card_div");
-    console.log("total number of emails: ", emails.length)
-    document.getElementById('total_n_emails').innerHTML = emails.length;
-    document.getElementById('n_emails_showing').innerHTML = emails.length;
+            for(j = i * 50; j < Math.min(((i * 50) + 50), all_data.length); j++) {
+                email_data[i].push(j);
+            }
+        }
 
-    // console.log("adding paginate")
-    // addPaginate()
+        // current_page = 1;
+        $('#pagination-nav').pagination({
+            pages: total_pages,
+            displayedPages: 7,
+            ellipsePageSet: false,
+            cssStyle: '',
+            prevText: '<span aria-hidden="true">&laquo;</span>',
+            nextText: '<span aria-hidden="true">&raquo;</span>',
+            onPageClick: function (page, evt) {
+                showCards();
+            }
+        });
+    }
+
+    var current_page = parseInt($(".pagination .active.page-item span")[0].innerHTML) - 1;
+
+    // Remove all existing cards
+    card_container.innerHTML = '';
+
+    // Add new cards
+    email_data[current_page].forEach( function(email) {
+        card_container.appendChild(all_data[email]["card_html"])
+    });
+
+    // Count all email elements
+    var total_n_emails = 0;
+    Object.keys(email_data).map(function(prop) {
+        total_n_emails+= email_data[prop].length;
+    });
+    document.getElementById('total_n_emails').innerHTML = total_n_emails.toLocaleString();
+    document.getElementById('n_emails_showing').innerHTML = email_data[current_page].length;
 
 }
+
+
+function reset_filters() {
+    document.getElementById("search_form").reset();
+    filter_emails();
+};
+
+
+function reset_dates() {
+    $('input[id="start_search_box"]').val('2014-01-01T00:00')
+    $('input[id="end_search_box"]').val('2019-12-31T00:00')
+    // filter_emails();
+};
