@@ -1,0 +1,213 @@
+/* GT America Condensed Regular */
+@font-face {
+  font-family:'gtamcond';
+  src: url("fonts/gtamerica/GT-America-Condensed-Regular.woff2") format('woff2');
+  font-weight:400;
+}
+
+/* GT America Condensed Bold */
+@font-face {
+  font-family:'gtamcond';
+  src: url("fonts/gtamerica/GT-America-Condensed-Bold.woff2") format('woff2');
+  font-weight:600;
+}
+
+
+/* GT America Compressed Bold */
+@font-face {
+  font-family:'gtamcomp';
+  src: url("fonts/gtamerica/GT-America-Compressed-Bold.otf") format('opentype');
+  font-weight:600;
+}
+
+/* GT America Regular */
+@font-face {
+  font-family:'gtam';
+  src: url("fonts/gtamerica/GT-America-Standard-Regular.woff2") format('woff2');
+  font-weight:400;
+}
+
+/* GT America Bold */
+@font-face {
+  font-family:'gtam';
+  src: url("fonts/gtamerica/GT-America-Standard-Bold.woff2") format('woff2');
+  font-weight:600;
+}
+
+body {
+	font-family: gtam;
+	color: black;
+	height: 100%;
+	width: 100%;
+	margin: 0px;
+}
+
+html {
+	height: 100%;
+}
+
+h1, h2, h3 {
+	/*font-family: GT America Condensed;*/
+	text-transform: uppercase;
+	font-weight: bold;
+}
+
+h1 {
+	text-align: center;
+	margin-bottom: 0px;
+}
+
+.navbar {
+	background-color: #0055aa !important;
+	height: 60px;
+}
+
+.navbar-collapse.show {
+    padding: 1rem;
+    background-color: rgb(0, 85, 170);
+}
+
+#nav_photo {
+  background-image: url("img/all_rep_faces_colorized.png"); /* The image used */
+  background-color: #b0dbe3; /* Used if the image is unavailable */
+  height: 20px; /* You must set a specified height */
+  background-position: center; /* Center the image */
+  background-repeat: no-repeat; /* Do not repeat the image */
+  background-size: cover; /* Resize the background image to cover the entire container */
+}
+
+.nav-link {
+	font-weight: 600;
+}
+
+.title {
+    font-size: 2.5rem;
+    font-family: 'gtamcomp';
+    color: #0055aa;
+    /*text-shadow: 2px 2px #b0dbe3;*/
+    line-height: 1;
+}
+
+#ihh-logo {
+	width: 50%;
+}
+
+#header {
+	text-align: center;
+    background-color: #cee3e7;
+    margin-top: 0px;
+    color: white;
+}
+
+#content {
+	margin-left: 10%;
+	margin-right: 10%;
+	margin-top: 1rem;
+	margin-bottom: 2rem;
+	min-height: calc(100% - 225px);
+}
+
+.card {
+	margin-bottom: 1rem;
+}
+
+.card-header {
+	/*background-color: rgb(215, 77, 81);*/
+    text-align: left;
+    text-transform: uppercase;
+    font-family: 'gtam';
+    font-weight: bold;
+    font-size: 1.4rem;
+    padding: 0px;
+    padding-left: 1rem;
+    /*color: white;*/
+    min-height: 34px;
+}
+
+.card-title {
+	font-family: 'gtamcond';
+    text-transform: uppercase;
+    font-weight: 800;
+    font-size: 2rem;
+}
+
+.card-text {
+	font-size: .9rem;
+}
+
+.card-subtitle {
+	font-style: italic;
+	font-size: .9rem;
+}
+
+.btn {
+	margin-left: auto;
+	display: block;
+	border-radius: 0px;
+    font-weight: 700;
+    display: inline-block;
+	/*background-color: #00acee;*/
+	/*border-color: #00acee;*/
+    color: white !important;
+    margin-top: -30px;
+    font-size: .9rem;
+}
+
+
+.email-description {
+	margin-top: 1rem;
+  border-top: solid #dee2e6 1px;
+}
+
+.cards-container .col-md-6 {
+	padding:0px;
+}
+
+#filter_button {
+	margin: .5px;
+    font-size: 1rem;
+    background-color: #0055aa;
+    border-color: #0055aa;
+}
+
+.search-card {
+	background-color: rgb(230 240 242 / 50%);
+    padding: 1rem;
+    margin: .5rem;
+}
+
+.search-card,
+.search-card input,
+.search-card .input-group-text {
+  font-size: .9rem !important;
+}
+
+#footer {
+	background-color: rgba(255, 255, 255, .5);
+    margin-bottom: 0px;
+    font-size: 0.8rem;
+    padding: 1rem;
+}
+
+#footer p {
+	margin-bottom: 0px;
+}
+
+.note {
+    padding: 1rem;
+    background-color: rgb(255 193 7 / 32%);
+    border-radius: .5rem;
+    font-size: .9rem;
+}
+
+.note h4 {
+    display: inline;
+    text-transform: uppercase;
+    font-family: 'gtamcomp';
+    color: goldenrod;
+}
+
+.note i {
+  margin-right: .5rem;
+  font-size: 1rem;
+}
