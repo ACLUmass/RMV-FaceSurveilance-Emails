@@ -31,3 +31,6 @@ data/src/*.csv
 .Rhistory
 .Rproj.user
 *.Rproj
+
+# Keys and such
+nlpAI/gcCreds.json
