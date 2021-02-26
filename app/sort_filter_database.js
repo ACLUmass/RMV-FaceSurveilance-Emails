@@ -67,7 +67,7 @@ function filter_emails() {
     // Update pagination 
     $('#pagination-nav').pagination({
         pages: total_pages,
-        displayedPages: 7,
+        displayedPages: n_pages_to_show,
         ellipsePageSet: false,
         cssStyle: '',
         prevText: '<span aria-hidden="true">&laquo;</span>',

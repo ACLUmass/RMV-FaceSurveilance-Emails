@@ -3,22 +3,58 @@
 var all_data;
 var i_email = 1;
 var email_pages;
+var n_pages_to_show;
+var total_pages;
 
 var card_container = document.getElementsByClassName("cards-container")[0]
 
 function load_data() {
-    // return $.getJSON("nodupsMail.json", function(json) {
-    return $.getJSON("allMails.json", function(json) {    
+    return $.getJSON("nodupMails.json", function(json) {
+    // return $.getJSON("allMails.json", function(json) {    
         all_data = json;
     });
 }
 
+updateSubjBodyPlaceholder(init=true)
 load_data()
     .then(() => {
         console.log("data loaded", all_data)
         createCards(all_data)
         showCards(init=true)
     })
+
+// Update the Subj/Body placeholder based on the screen size
+window.addEventListener('resize', function() {
+    updateSubjBodyPlaceholder();
+});
+
+function updateSubjBodyPlaceholder(init=false) {
+    if ($(window).width() < 550 ) {
+        $("input[id='body_search_box']").attr("placeholder","e.g. Facebook");
+        n_pages_to_show = 2
+    }
+    else { 
+        $("input[id='body_search_box']").attr("placeholder","e.g. request, Idemia, NYPD, Facebook");
+        n_pages_to_show = 6
+    }
+
+    if (!init) {
+        console.log("showing just this many pages", n_pages_to_show)
+
+        // current_page = 1;
+        $('#pagination-nav').pagination({
+            pages: total_pages,
+            displayedPages: n_pages_to_show,
+            ellipsePageSet: false,
+            cssStyle: '',
+            prevText: '<span aria-hidden="true">&laquo;</span>',
+            nextText: '<span aria-hidden="true">&raquo;</span>',
+            onPageClick: function (page, evt) {
+                showCards();
+            }
+        });
+    }
+}
 
 function createCards(all_data) {
 
@@ -99,7 +135,7 @@ function showCards(init=false) {
         // current_page = 1;
         $('#pagination-nav').pagination({
             pages: total_pages,
-            displayedPages: 7,
+            displayedPages: n_pages_to_show,
             ellipsePageSet: false,
             cssStyle: '',
             prevText: '<span aria-hidden="true">&laquo;</span>',
@@ -142,3 +178,7 @@ function reset_dates() {
     $('input[id="end_search_box"]').val('2019-12-31T00:00')
     // filter_emails();
 };
+
+
+
+

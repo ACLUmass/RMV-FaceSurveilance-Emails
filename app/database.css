@@ -78,6 +78,11 @@ h1 {
 
 .nav-link {
 	font-weight: 600;
+  color: white;
+}
+
+.nav-link:hover {
+  color: rgb(255 255 255 / 70%);
 }
 
 .title {
@@ -229,4 +234,57 @@ h1 {
 
 #pagination-nav {
   display:inline;
+}
+
+
+/*Make sure the search form looks right on mobile*/
+.input-group{
+  display: inline-flex;
+  width: 100%;
+}
+
+.search-card .row {
+  margin: 0px;
+}
+
+.search-card div[class^="col-"], 
+.search-card div[class*=" col-"] {
+  padding: 3px;
+
+}
+
+.datetime-input-group .btn {
+  font-weight: 200;
+  font-size: small;
+  margin-left: -1px;
+}
+
+
+@media (max-width: 800px) {
+  .search-card {
+    font-size: .7rem;
+  }
+
+  .datetime-input-group .form-control{
+    width: 100%;
+  }
+
+  .datetime-input-group .btn {
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+    border-bottom-left-radius: .25rem;
+    border-bottom-right-radius: .25rem;
+  }
+
+  .datetime-input-group .input-group-prepend {
+    width: 100%;
+    margin-bottom: -3px;
+  }
+
+  .datetime-input-group .input-group-text {
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+    width: 100%;
+  }
 }

@@ -26,24 +26,16 @@
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-md navbar-dark bg-dark">
+    <nav class="navbar navbar-dark bg-dark">
         <a class="navbar-brand">
             <img src="img/white_logo.png" alt="ACLU of Massachusetts logo" height="30px">
         </a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-            <span class="navbar-text d-none d-md-block">
-                <em>An initiative by the <a href="https://www.aclum.org/" target="_blank">ACLU of Massachusetts</a></em>
-            </span>
-            <!-- <div class="navbar-nav ml-auto">
-                <a class="nav-item nav-link" href="https://data.aclum.org/it-happens-here/">View Map</a>
-                <a class="nav-item nav-link" href="https://docs.google.com/forms/d/e/1FAIpQLScmhMIsDd_Ap2GqHHYe6BfBO87D_qIMQ-3n8YJbkUzEdEHjqw/viewform" target="_blank">Submit Incident</a>
-                <a class="nav-item nav-link" href="https://action.aclu.org/send-message/tell-massachusetts-lawmakers-pass-strong-police-reform-bill?ms_aff=MA&initms_aff=MA&ms=200923_MAP_&initms=200923_MAP_&ms_chan=ptp&initms_chan=ptp" target="_blank">Take Action</a>
-            </div> -->
-        </div>
+        <span class="navbar-text d-none d-md-block mr-auto">
+            <em>An initiative by the <a href="https://www.aclum.org/" target="_blank">ACLU of Massachusetts</a></em>
+        </span>
+
     </nav>
+
     <div id="nav_photo"></div>
     <div id="content">
         <h2 class="title">Search the RMV Facial Recognition Emails</h2>
@@ -57,47 +49,67 @@
         <div class="card search-card">
             <h5 class="card-title" style="font-size: 1.5rem;">Search by:</h5>
             <form id="search_form">
-            <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <span class="input-group-text" id="basic-addon1">From</span>
-                </div>
-                <input id="from_search_box" type="text" class="form-control mr-3" placeholder="e.g. Karen"
-                       aria-label="From" aria-describedby="basic-addon1">
+                <div class="row">
+                    <div class="input-group mb-3 col-md-4">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="basic-addon1">From</span>
+                        </div>
+                        <input id="from_search_box" type="text" class="form-control mr-1" placeholder="e.g. Karen"
+                               aria-label="From" aria-describedby="basic-addon1">
+                    </div>
 
-                <div class="input-group-prepend">
-                    <span class="input-group-text" id="basic-addon1">To</span>
-                </div>
-                <input id="to_search_box" type="text" class="form-control mr-3" placeholder="e.g. Michael"
-                       aria-label="To" aria-describedby="basic-addon1">
-            </div>
+                    <div class="input-group mb-3 col-md-4">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="basic-addon1">To</span>
+                        </div>
+                        <input id="to_search_box" type="text" class="form-control mr-1" placeholder="e.g. Michael"
+                               aria-label="To" aria-describedby="basic-addon1">
+                    </div>
 
-            <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <span class="input-group-text" id="basic-addon1">CC</span>
-                </div>
-                <input id="cc_search_box" type="text" class="form-control mr-3" placeholder="e.g. Jean"
+                    <div class="input-group mb-3 col-md-4">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="basic-addon1">CC</span>
+                        </div>
+                        <input id="cc_search_box" type="text" class="form-control mr-1" placeholder="e.g. Jean"
                        aria-label="CC" aria-describedby="basic-addon1">
-
-                <div class="input-group-prepend">
-                    <span class="input-group-text" id="basic-addon1">Subject & Body</span>
+                   </div>
                 </div>
-                <input id="body_search_box" type="text" class="form-control mr-3" placeholder="e.g. Idemia, NYPD, Facebook"
+
+                <div class="row">
+                   <div class="input-group mb-3 col-12">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="basic-addon1">Subj/Body</span>
+                        </div>
+                        <input id="body_search_box" type="text" class="form-control mr-1" placeholder="e.g. request, Idemia, NYPD, Facebook"
                        aria-label="Subject & Body" aria-describedby="basic-addon1">
-            </div>
-
-            <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <span class="input-group-text" id="basic-addon1">Date & Time</span>
+                    </div>
                 </div>
-                <input type="datetime-local" id="start_search_box" value="2014-01-01T00:00">
-                <input type="datetime-local" id="end_search_box" value="2019-12-31T00:00">
-                <a onclick="reset_dates();" class="btn btn-primary" tabindex="-1" role="button" aria-disabled="true" id="reset_button">
-                    Reset Dates
-                </a>
 
-            </div>
-            </form>
+                <div class="row datetime-input-group">
 
+                    <!-- <div class="input-group mb-3"> -->
+                        <div class="input-group-prepend d-md-none">
+                                <span class="input-group-text" id="basic-addon1">Date/Time Range</span>
+                            </div>
+
+                            <div class="input-group mb-3">
+                            <div class="input-group-prepend d-none d-md-inline-flex">
+                                <span class="input-group-text" id="basic-addon1">Date/Time Range</span>
+                            </div>
+                            <input class="form-control" type="datetime-local" id="start_search_box" value="2014-01-01T00:00">
+
+                            <input class="form-control" type="datetime-local" id="end_search_box" value="2019-12-31T00:00">
+
+                            <a onclick="reset_dates();" class="btn btn-primary" tabindex="-1" role="button" aria-disabled="true" id="reset_button">
+                                Reset Dates
+                            </a>
+
+
+                        </div>
+
+                </div>
+            </form> 
+            
             <div align="center">
                 <a onclick="filter_emails();" class="btn btn-primary" tabindex="-1" role="button" aria-disabled="true" id="filter_button">
                     Filter
