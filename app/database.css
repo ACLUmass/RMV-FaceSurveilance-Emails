@@ -236,7 +236,6 @@ h1 {
   display:inline;
 }
 
-
 /*Make sure the search form looks right on mobile*/
 .input-group{
   display: inline-flex;
@@ -258,7 +257,6 @@ h1 {
   font-size: small;
   margin-left: -1px;
 }
-
 
 @media (max-width: 800px) {
   .search-card {
@@ -288,3 +286,29 @@ h1 {
     width: 100%;
   }
 }
+
+/* Modal */
+.modal-title {
+  font-family: 'gtamcond';
+  color: white;
+  line-height: .8;
+}
+
+.modal-header {
+  background-color: #0055aa;
+}
+
+.modal-body {
+  font-size: small;
+}
+
+.modal-body h5 {
+  font-family: 'gtamcond';
+    color: #0055aa;
+    font-weight: 600;
+}
+
+.modal-header button {
+  color: white;
+}
+

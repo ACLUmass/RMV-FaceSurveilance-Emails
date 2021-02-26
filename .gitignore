@@ -20,6 +20,7 @@ ext_doc
 
 # Lauren's sandbox
 old_data
+dev/
 
 # until I hear otherwise, I don't want to store RMV source files in a repo
 data/src/*.pdf
