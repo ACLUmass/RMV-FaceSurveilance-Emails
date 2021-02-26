@@ -160,6 +160,9 @@ mailTot = len(mails)
 dupIds = []
 missCt = 0
 for i in range(mailTot-1):
+  if i % 50 == 0:
+    print(i)
+
   if not i in dupIds: #don't check email that is already identified as duplicate
     tmp = mails[i]
     nodupMails.append(tmp)
