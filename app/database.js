@@ -120,7 +120,7 @@ function showCards(init=false) {
     console.log("running showCards")
 
     if (init) {
-        total_pages = 221;
+        total_pages = 69;
 
         email_data = {};
         for(i = 0; i < total_pages; i++) {

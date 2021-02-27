@@ -54,7 +54,7 @@ function filter_emails() {
 
             email_data[email_page].push(i)
 
-            if (num_emails_displayed >= 50) {
+            if (num_emails_displayed % 50 == 0) {
                 email_page++;
                 email_data[email_page] = [];
             }
@@ -62,7 +62,7 @@ function filter_emails() {
     };
 
 
-    var total_pages = Math.floor(num_emails_displayed/50)
+    total_pages = Math.ceil(num_emails_displayed/50)
 
     // Update pagination 
     $('#pagination-nav').pagination({
