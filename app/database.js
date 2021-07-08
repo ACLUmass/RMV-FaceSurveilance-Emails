@@ -58,13 +58,6 @@ function updateSubjBodyPlaceholder(init=false) {
 
 function createCards(all_data) {
 
-    console.log("set up load listener")
-    window.addEventListener('load', (event) => {
-      console.log('page is fully loaded');
-    });
-
-    console.log("number of emails?", all_data.length)
-
     // Add cards for all emails
     for (email in all_data) {
 
@@ -147,6 +140,7 @@ function showCards(init=false) {
     }
 
     var current_page = parseInt($(".pagination .active.page-item span")[0].innerHTML) - 1;
+    console.log(current_page)
 
     // Remove all existing cards
     card_container.innerHTML = '';
