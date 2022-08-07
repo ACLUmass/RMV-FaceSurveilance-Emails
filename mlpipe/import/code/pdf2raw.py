@@ -80,11 +80,13 @@ cols_ex = col_nms + ' = [x for x in range(' + str(col_ct) + ')]' #executable str
 
 tbl = [col_nms,db,pdf_ids]
 with open(args.outf,'w') as f:
-  json.dump(tbl,f,indent=2)
+  #json.dump(tbl,f,indent=2)
+  json.dump(db,f,indent=2)
 
 tbl = [col_nms,crvs,pdf_ids]
 with open(args.crvf,'w') as f:
-  json.dump(tbl,f)
+  #json.dump(tbl,f)
+  json.dump(db,f)
         
 with open(args.dbgf, 'w', newline='') as csvfile:
   spamwriter = csv.writer(csvfile, delimiter=',')

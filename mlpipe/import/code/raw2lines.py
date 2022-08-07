@@ -77,7 +77,8 @@ parser.add_argument('dbgf', help='csv debug file')
 args = parser.parse_args()
   
 with open(args.inf,'r') as inf:
-  hdr,db,pdf_ids = json.load(inf)
+  #hdr,db,pdf_ids = json.load(inf)
+  db = json.load(inf)
 
 #################### Issues with pdf to json conversion #######################
 # - Text on the same horizontal may be in different elements if the horizontal space between two words is large
@@ -103,12 +104,6 @@ for elem in db:
     page.append(elem)
 pages.extend(mkblocks(page))
 
-
-
-
 with open(args.outf,'w') as f:
   json.dump(pages,f,indent=2)
 
-
-
-exit()

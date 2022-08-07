@@ -31,7 +31,7 @@ endif
 all : $(out_dir)$(grp)_$(sz)_lines.json
 
 #make lines from raw blocks scraped out of pdfs
-$(out_dir)$(grp)_$(sz)_lines.json : $(code_dir)raw2lines.py
+$(out_dir)$(grp)_$(sz)_lines.json : $(out_dir)$(grp)_$(sz)_raw.json $(code_dir)raw2lines.py
 	touch $(code_dir)raw2lines.py
 	python $(mpdb) $(code_dir)raw2lines.py \
 		$(grp) \
