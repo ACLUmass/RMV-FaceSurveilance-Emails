@@ -1,5 +1,5 @@
 proot := $(shell git rev-parse --show-toplevel)/
-proj_dir := $(proot)/mlpipe/import/
+proj_dir := $(proot)mlpipe/import/
 in_dir := $(proot)data/src/
 code_dir := $(proj_dir)code/
 out_dir := $(proj_dir)output/
@@ -26,7 +26,7 @@ else ifdef dmp
 	dmpf := > $(dmp)
 endif
 
-.PHONY: all
+.PHONY: all log
 
 all : $(out_dir)$(grp)_$(sz)_lines.json
 
@@ -49,5 +49,14 @@ $(out_dir)$(grp)_$(sz)_raw.json : $(code_dir)pdf2raw.py
 		$(out_dir)$(grp)_$(sz)_raw.json \
 		$(out_dir)$(grp)_$(sz)_crv.json \
 		$(dbg_dir)$(grp)_$(sz)_raw.csv \
+		$(pgs) $(dmpf)
+
+#convert csv enforcement log input to json database
+log $(out_dir)$(grp)_$(sz)_enforce_log.json : $(code_dir)csv2log.py
+	touch $(code_dir)csv2log.py
+	python $(mpdb) $(code_dir)csv2log.py \
+		$(in_dir) \
+		$(out_dir)$(grp)_$(sz)_enforce_log.json \
+		$(dbg_dir)$(grp)_$(sz)_enforce_log.csv \
 		$(pgs) $(dmpf)
 

@@ -24,13 +24,28 @@ args = parser.parse_args()
 with open(args.inf,'r') as inf:
   db = json.load(inf)
 
+pdf_pg = None
+pg_doc_ct = 0
 for line in db:
   for nm,chk in line_types.items():
     if chk.search(line[text]) != None:
-      line.append(nm)
+      if nm == 'from_hdr':
+        tmp = line[pdf_id] + '_' + str(line[pg])
+        if tmp != pdf_pg:
+          pdf_pg = tmp
+          pg_doc_ct = 0
+        pg_doc_ct += 1
+        doc_id = pdf_pg + '_' + str(pg_doc_ct)
+      #line.append(nm)
+      line.extend([nm,doc_id])
       break
   else:
-    line.append(None)
+    try:
+      doc_id
+    except:
+      doc_id = None
+    #line.append(None)
+    line.extend([None,doc_id])
 
 with open(args.outf,'w') as f:
   json.dump(db,f,indent=2)
@@ -55,7 +70,7 @@ for line in db:
   elif line[lntype] == 'subj_hdr' or line[lntype] == 'rply_hdr': 
     lines_ct += 1
       
-col_nms = 'pdf,pg,x0,x1,y0,y1,text,lntype'
+col_nms = 'pdf,pg,x0,x1,y0,y1,text,lntype,doc_id'
 cols = col_nms.split(',') #use as first row of csv output file for column names
 col_ct = len(cols)
         

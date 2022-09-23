@@ -86,7 +86,7 @@ with open(args.outf,'w') as f:
 tbl = [col_nms,crvs,pdf_ids]
 with open(args.crvf,'w') as f:
   #json.dump(tbl,f)
-  json.dump(db,f)
+  json.dump(db,f,indent=2)
         
 with open(args.dbgf, 'w', newline='') as csvfile:
   spamwriter = csv.writer(csvfile, delimiter=',')
