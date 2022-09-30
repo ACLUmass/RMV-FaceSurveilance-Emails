@@ -26,7 +26,7 @@ else ifdef dmp
 	dmpf := > $(dmp)
 endif
 
-.PHONY: all
+.PHONY: all cops
 
 #all : $(out_dir)$(grp)_$(sz)_raw.json
 
@@ -39,5 +39,16 @@ $(out_dir)$(grp)_$(sz)_types.json : $(code_dir)linetypes.py
 		$(in_dir)$(grp)_$(sz)_lines.json \
 		$(out_dir)$(grp)_$(sz)_linetypes.json \
 		$(dbg_dir)$(grp)_$(sz)_linetypes.csv \
+		$(dmpf)
+
+#scrape pdf sources and make a database of all the pages
+cops $(out_dir)$(grp)_$(sz)_cops.json : $(code_dir)coptypes.py
+	touch $(code_dir)coptypes.py
+	python $(mpdb) $(code_dir)coptypes.py \
+		$(grp) \
+		$(in_dir)$(grp)_big_enforce_log.json \
+		$(out_dir)$(grp)_$(sz)_linetypes.json \
+		$(out_dir)$(grp)_$(sz)_cops.json \
+		$(dbg_dir)$(grp)_$(sz)_cops.csv \
 		$(dmpf)
 
