@@ -2,6 +2,7 @@ import argparse
 from nameparser import HumanName
 import re
 import json
+from datetime import datetime
 import csv
 '''
 from pdfminer.high_level import extract_pages
@@ -49,11 +50,59 @@ def getFromNames(text):
   tmp = s.sub(' ',tmp)
   return parseName(tmp)
 
+def mkTimeStamp(yr,mon,day): #mon is month abbreviation or fullname
+  try:
+    mon_num = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'].index(mon[0:3]) + 1
+    #return yr,mon,day
+    return datetime(int(yr),mon_num,int(day)).timestamp()
+  except:
+    return None
+
+def getEmailDate(text):
+  tmp = re.search('\d{4}',text)
+  if tmp == None:
+    #return None,None,None
+    return None
+  yr = tmp.group()
+  tmp1 = re.search('\d{1,2}',text[0:tmp.start()])
+  if tmp1 == None:
+    return None
+  day = tmp1.group()
+  tmp2 = text[0:tmp1.start()].split()
+  return mkTimeStamp(yr,tmp2[-1],day)
+  #try:
+  #  mon = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'].index(tmp2[-1][0:3]) + 1
+  #  #return yr,mon,day
+  #  return datetime(yr,mon,day).timestamp()
+  #except:
+  #  return None
+
+  #this routine is hand created from looking at the names in the log. It includes nicknames
+  #and spelling corrections
+def first_nm_eq(nm0,nm1):
+  sames = [['Anthony','Tony'],
+           ['Susan','Sue'],
+           ['Jamie','Jaime'],
+           ['Stephen','Stepher'],
+           ['Timothy','Tim'],
+           ['Joao','Jogo'],
+           ['Michael','Mike'],
+           ['Robert','Bobby'],
+           ['Benjamin','Ben']]
+
+  for same in sames:
+    if nm0 in same and nm1 in same:
+      return True
+  if nm0 == nm1:
+    return True
+  return False
+  
 parser = argparse.ArgumentParser()
 parser.add_argument('grp', help='chooses group of files')
 parser.add_argument('inf0', help='face recognition log json file')
 parser.add_argument('inf1', help='email json file')
 parser.add_argument('outf', help='cops json file')
+parser.add_argument('outf1', help='froms json file')
 parser.add_argument('dbgf', help='csv debug file')
 args = parser.parse_args()
   
@@ -63,53 +112,86 @@ with open(args.inf0,'r') as inf:
 #yr,mo,dt,cop,agency,office,gov,rq_type,rq_ct,match_ct,photo_ary,other = [x for x in range(12)]
 #The people listed in the request log are not employees of MASS DOT-RMV/Enforcement Services 
 #that runs FR software
-uniq_rq_cops = []
+rq_cops = []
 for rq in rqs_db:
   first_nm,sur_nm = getLogNames(rq[3])
-  for uniq_rq_cop in uniq_rq_cops: 
-    if first_nm == uniq_rq_cop[1] and sur_nm == uniq_rq_cop[2]:
-      break
-  else:
-    uniq_rq_cops.append([rq[3],first_nm,sur_nm] + rq[4:7])
+  time_stamp = mkTimeStamp(rq[0],rq[1],rq[2])
+  if time_stamp != None:
+    rq_cops.append([rq[0],rq[1],rq[2],rq[3],first_nm,sur_nm] + rq[4:8] + [time_stamp])
 
-     
-col_nms = 'cop,1st_nm,2nd_nm,agency,office,gov'
-        
-with open(args.dbgf, 'w', newline='') as csvfile:
-  csvwriter = csv.writer(csvfile, delimiter=',')
-  csvwriter.writerow(col_nms.split(','))
-  for row in uniq_rq_cops:
-    csvwriter.writerow(row)
- 
-exit()
+rq_cops.sort(key=lambda row: row[-1])
+
+sur_nm_db = {}
+for rq_cop in rq_cops:
+  sur_nm = rq_cop[5]
+  first_nm = rq_cop[4]
+  if sur_nm in sur_nm_db:
+    if first_nm != '':
+      if not first_nm in sur_nm_db[sur_nm]: 
+        sur_nm_db[sur_nm].append(first_nm)
+  else:
+    if first_nm != '':
+      sur_nm_db[sur_nm] = [rq_cop[4]]
   
+sur_nm_dups = {}
+for sur_nm,firsts in sur_nm_db.items():
+  if len(firsts) > 1:
+    sur_nm_dups[sur_nm] = firsts
+
+#for sur_nm,firsts in sur_nm_dups.items():
+#  print(sur_nm,firsts)
+
 with open(args.inf1,'r') as inf:
   email_db = json.load(inf)
+ 
+#from,email_id,first_nm,sur_nm,date,time_stamp
+emails_info = []
+email_info = None
+for email in email_db:
+  if email[7] == 'from_hdr':
+    first_nm,sur_nm = getFromNames(email[6])
+    email_info = [email[6],email[8],first_nm,sur_nm]
+  elif email[7] == 'date_hdr':
+    if email_info != None:
+      date = getEmailDate(email[6])
+      if date != None:
+        email_info.extend([email[6],date])
+        emails_info.append(email_info)
+      email_info = None
 
-#The people sending emails includes FR requestors and MASS DOT-RMV employees 
-email_froms = [[x[6],x[8]] for x in email_db if x[7] == 'from_hdr']
+emails_info.sort(key=lambda row: row[-1])
+with open(args.outf1,'w') as f:
+  json.dump(emails_info,f,indent=2)
 
-uniq_email_froms = []
-for email_from in email_froms:
-  first_nm,sur_nm = getFromNames(email_from[0])
-  for uniq_email_from in uniq_email_froms: 
-    if first_nm == uniq_email_from[2] and sur_nm == uniq_email_from[3]:
-      break
-  else:
-    uniq_email_froms.append([email_from[0],email_from[1],first_nm,sur_nm])
 
+for rq_cop in rq_cops:
+  if rq_cop[5] != None:
+    for email_info in emails_info:
+      if rq_cop[-1] == email_info[-1]:
+        if rq_cop[5] == email_info[3]:
+          if rq_cop[4] == None or email_info[2] == None or first_nm_eq(rq_cop[4],email_info[2]) == True:
+            rq_cop.append(email_info[1])
+            break
      
-'''
-col_nms = 'cop,email_id,first_nm,sur_nm'
+col_nms = 'yr,mon,day,cop,1st_nm,2nd_nm,agency,office,gov,type,time_stamp,rq_id'
         
 with open(args.dbgf, 'w', newline='') as csvfile:
   csvwriter = csv.writer(csvfile, delimiter=',')
   csvwriter.writerow(col_nms.split(','))
-  for row in uniq_email_froms:
+  for row in rq_cops:
+    csvwriter.writerow(row)
+
+exit()
+
+col_nms = 'cop,email_id,first_nm,sur_nm,date,year,month,day'
+        
+with open(args.dbgf, 'w', newline='') as csvfile:
+  csvwriter = csv.writer(csvfile, delimiter=',')
+  csvwriter.writerow(col_nms.split(','))
+  for row in emails_info:
     csvwriter.writerow(row)
  
 exit()
-'''
  
 #Removing known FR requestors and MASS-DOT_RMV employees from the email senders should show us
 #the FR email requests that were omitted from the log

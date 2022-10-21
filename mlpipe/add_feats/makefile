@@ -26,7 +26,7 @@ else ifdef dmp
 	dmpf := > $(dmp)
 endif
 
-.PHONY: all cops
+.PHONY: all cops email
 
 #all : $(out_dir)$(grp)_$(sz)_raw.json
 
@@ -50,5 +50,17 @@ cops $(out_dir)$(grp)_$(sz)_cops.json : $(code_dir)coptypes.py
 		$(out_dir)$(grp)_$(sz)_linetypes.json \
 		$(out_dir)$(grp)_$(sz)_cops.json \
 		$(dbg_dir)$(grp)_$(sz)_cops.csv \
+		$(dmpf)
+
+#match log entries to their pdf ids
+email $(out_dir)$(grp)_$(sz)_email.json : $(code_dir)email2log.py
+	touch $(code_dir)email2log.py
+	python $(mpdb) $(code_dir)email2log.py \
+		$(grp) \
+		$(in_dir)$(grp)_big_enforce_log.json \
+		$(out_dir)$(grp)_$(sz)_linetypes.json \
+		$(out_dir)$(grp)_$(sz)_email2log.json \
+		$(out_dir)$(grp)_$(sz)_email_info.json \
+		$(dbg_dir)$(grp)_$(sz)_email2log.csv \
 		$(dmpf)
 
