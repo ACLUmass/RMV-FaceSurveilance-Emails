@@ -3,18 +3,9 @@ from nameparser import HumanName
 import re
 import json
 import csv
+from datetime import datetime
 '''
-from pdfminer.high_level import extract_pages
-#print(pdfminer.__version__)
-
-pdf_id,pg,x0,x1,y0,y1,text,lntype = [x for x in range(8)]
-line_types = {}
-line_types['from_hdr'] = re.compile('^From:')
-line_types['to_hdr'] = re.compile('^To:')
-line_types['cc_hdr'] = re.compile('^Cc:')
-line_types['date_hdr'] = re.compile('^Date:|Sent:')
-line_types['rply_hdr'] = re.compile('^Subject:\s+RE:') #NOTE - must be ahead of subj_hdr
-line_types['subj_hdr'] = re.compile('^Subject:')
+Parse each log entry and add features based on content. Reorganize the columns for easier manual inspection and debugging
 '''
 def parseName(text):
   name = HumanName(text)
@@ -49,10 +40,17 @@ def getFromNames(text):
   tmp = s.sub(' ',tmp)
   return parseName(tmp)
 
+def mkTimeStamp(yr,mon,day): #mon is month abbreviation or fullname
+  try:
+    mon_num = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'].index(mon[0:3]) + 1
+    #return yr,mon,day
+    return datetime(int(yr),mon_num,int(day)).timestamp()
+  except:
+    return None
+
+
 parser = argparse.ArgumentParser()
-parser.add_argument('grp', help='chooses group of files')
 parser.add_argument('inf0', help='face recognition log json file')
-parser.add_argument('inf1', help='email json file')
 parser.add_argument('outf', help='cops json file')
 parser.add_argument('dbgf', help='csv debug file')
 args = parser.parse_args()
@@ -63,22 +61,30 @@ with open(args.inf0,'r') as inf:
 #yr,mo,dt,cop,agency,office,gov,rq_type,rq_ct,match_ct,photo_ary,other = [x for x in range(12)]
 #The people listed in the request log are not employees of MASS DOT-RMV/Enforcement Services 
 #that runs FR software
-uniq_rq_cops = []
+rq_cops = []
+no_date_ct = 0
 for rq in rqs_db:
   first_nm,sur_nm = getLogNames(rq[3])
-  for uniq_rq_cop in uniq_rq_cops: 
-    if first_nm == uniq_rq_cop[1] and sur_nm == uniq_rq_cop[2]:
-      break
+  ts = mkTimeStamp(rq[0],rq[1],rq[2])#for rq_cop in rq_cops: 
+  if ts != None:
+  #  if first_nm == rq_cop[1] and sur_nm == rq_cop[2]:
+  #    break
+  #else:
+  #  rq_cops.append([rq[3],first_nm,sur_nm] + rq[4:7])
+    rq_cops.append([ts,rq[7],first_nm,sur_nm,rq[4],rq[6],rq[0],rq[1],rq[2],rq[3],rq[5],rq[8],rq[9],rq[10],rq[11]])
   else:
-    uniq_rq_cops.append([rq[3],first_nm,sur_nm] + rq[4:7])
+    no_date_ct += 1
 
+rq_cops.sort(key=lambda row: row[0])
+print('no_date_ct ',no_date_ct)
      
-col_nms = 'cop,1st_nm,2nd_nm,agency,office,gov'
+#col_nms = 'cop,1st_nm,2nd_nm,agency,office,gov'
+col_nms = 'tm_stmp,rq_type,first,sur_nm,agency,gov,yr,mo,dt,cop,office,gov,rq_ct,match_ct,photo_ary,other'
         
 with open(args.dbgf, 'w', newline='') as csvfile:
   csvwriter = csv.writer(csvfile, delimiter=',')
   csvwriter.writerow(col_nms.split(','))
-  for row in uniq_rq_cops:
+  for row in rq_cops:
     csvwriter.writerow(row)
  
 exit()

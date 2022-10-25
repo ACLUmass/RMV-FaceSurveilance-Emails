@@ -58,7 +58,40 @@ def mkTimeStamp(yr,mon,day): #mon is month abbreviation or fullname
   except:
     return None
 
-def getEmailDate(text):
+def getEmailTimeStamp(text):
+  tmp = re.match('\w{4}:',text)
+  if tmp == None:
+    return None
+  tmp1 = text[tmp.end():].strip()
+  tmp2 = re.search(' AM ',tmp1)
+  if tmp2 != None:
+    tmp1 = tmp1[0:tmp2.end()].strip()
+  try:
+    return datetime.strptime(tmp1,'%A, %B %d, %Y %I:%M:%S %p').timestamp()
+  except:
+    pass
+  try:
+    return datetime.strptime(tmp1,'%a, %B %d, %Y %I:%M:S %p').timestamp()
+  except:
+    pass
+  try:
+    return datetime.strptime(tmp1,'%A, %B %d, %Y %I:%M %p').timestamp()
+  except:
+    pass
+  try:
+    return datetime.strptime(tmp1,'%a, %B %d, %Y %I:%M %p').timestamp()
+  except:
+    print(tmp1)
+    return None
+
+  #if re.search(':\d{2}:\d{2}',tmp1) != None:
+  #  dform = '%A, %B %d, %Y %I:%M:%S %p'
+  #else:
+  #  dform = '%A, %B %d, %Y %I:%M %p'
+  #tmp2 = datetime.strptime(tmp1,dform)
+  #return tmp2.timestamp()
+
+'''
   tmp = re.search('\d{4}',text)
   if tmp == None:
     #return None,None,None
@@ -70,12 +103,7 @@ def getEmailDate(text):
   day = tmp1.group()
   tmp2 = text[0:tmp1.start()].split()
   return mkTimeStamp(yr,tmp2[-1],day)
-  #try:
-  #  mon = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'].index(tmp2[-1][0:3]) + 1
-  #  #return yr,mon,day
-  #  return datetime(yr,mon,day).timestamp()
-  #except:
-  #  return None
+'''
 
   #this routine is hand created from looking at the names in the log. It includes nicknames
   #and spelling corrections
@@ -121,6 +149,7 @@ for rq in rqs_db:
 
 rq_cops.sort(key=lambda row: row[-1])
 
+#Find all the cops who are listed with full first names and nicknames
 sur_nm_db = {}
 for rq_cop in rq_cops:
   sur_nm = rq_cop[5]
@@ -149,20 +178,28 @@ emails_info = []
 email_info = None
 for email in email_db:
   if email[7] == 'from_hdr':
+    if email_info != None:
+      emails_info.append(email_info)
+      email_info = None
     first_nm,sur_nm = getFromNames(email[6])
-    email_info = [email[6],email[8],first_nm,sur_nm]
+    #email_info = [email[6],email[8],first_nm,sur_nm,None,None,'']
+    email_info = [email[6],email[8],first_nm,sur_nm,None,None]
   elif email[7] == 'date_hdr':
     if email_info != None:
-      date = getEmailDate(email[6])
-      if date != None:
-        email_info.extend([email[6],date])
-        emails_info.append(email_info)
-      email_info = None
+      ts = getEmailTimeStamp(email[6])
+      email_info[4:6] = [email[6],ts]
+  #elif email[7] == None:
+  #  email_info[6] += email[6] + ' '
 
-emails_info.sort(key=lambda row: row[-1])
+if email_info != None:
+  emails_info.append(email_info)
+
+emails_info = [x for x in emails_info if x[5] != None]
+emails_info.sort(key=lambda row: row[5])
 with open(args.outf1,'w') as f:
   json.dump(emails_info,f,indent=2)
 
+exit()
 
 for rq_cop in rq_cops:
   if rq_cop[5] != None:
