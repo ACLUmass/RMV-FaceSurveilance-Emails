@@ -26,12 +26,12 @@ else ifdef dmp
 	dmpf := > $(dmp)
 endif
 
-.PHONY: all cops email
+.PHONY: all lns cops email
 
 #all : $(out_dir)$(grp)_$(sz)_raw.json
 
 #scrape pdf sources and make a database of all the pages
-$(out_dir)$(grp)_$(sz)_types.json : $(code_dir)linetypes.py
+lns $(out_dir)$(grp)_$(sz)_types.json : $(code_dir)linetypes.py
 #$(grp) : $(code_dir)pdf2raw.py
 	touch $(code_dir)linetypes.py
 	python $(mpdb) $(code_dir)linetypes.py \
