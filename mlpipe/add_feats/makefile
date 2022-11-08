@@ -26,13 +26,12 @@ else ifdef dmp
 	dmpf := > $(dmp)
 endif
 
-.PHONY: all lns cops email
+.PHONY: all lns log email
 
 #all : $(out_dir)$(grp)_$(sz)_raw.json
 
 #scrape pdf sources and make a database of all the pages
 lns $(out_dir)$(grp)_$(sz)_types.json : $(code_dir)linetypes.py
-#$(grp) : $(code_dir)pdf2raw.py
 	touch $(code_dir)linetypes.py
 	python $(mpdb) $(code_dir)linetypes.py \
 		$(grp) \
@@ -42,12 +41,12 @@ lns $(out_dir)$(grp)_$(sz)_types.json : $(code_dir)linetypes.py
 		$(dmpf)
 
 #scrape pdf sources and make a database of all the pages
-cops $(out_dir)$(grp)_$(sz)_cops.json : $(code_dir)coptypes.py
-	touch $(code_dir)coptypes.py
-	python $(mpdb) $(code_dir)coptypes.py \
+log $(out_dir)log_info.json : $(code_dir)loginfo.py
+	touch $(code_dir)loginfo.py
+	python $(mpdb) $(code_dir)loginfo.py \
 		$(in_dir)$(grp)_big_enforce_log.json \
-		$(out_dir)$(grp)_$(sz)_coptypes.json \
-		$(dbg_dir)$(grp)_$(sz)_coptypes.csv \
+		$(out_dir)log_info.json \
+		$(dbg_dir)log_info.csv \
 		$(dmpf)
 
 #match log entries to their pdf ids
