@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import datetime
 import statistics
+import re
 
 #{{{ pdf class code
 ############################### pdf class code #############################
@@ -95,6 +96,43 @@ class PDF(FPDF):
 #}}}
 #{{{ helper functions
 ############################### helper functions ###########################
+def rqMeth(text):
+  #order matters because there will be entries with multiple matches and the first is highest priority
+  rq_meths = {}
+  rq_meths['email'] = re.compile('email')
+  rq_meths['walkin'] = re.compile('walkin')
+  rq_meths['fax'] = re.compile('fax')
+  rq_meths['phone'] = re.compile('phone')
+
+  if text == None:
+    return None
+  tmp = text.lower()
+  tmp = tmp.replace('-','')
+  for nm,chk in rq_meths.items():
+    if chk.search(tmp) != None:
+      return nm
+  return None
+
+def rqAgency(gov_lev,agency):
+  if gov_lev == None:
+    return None,None
+  if re.match('Out',gov_lev) != None: #Only out of state agencies with more than one hit are named
+    if agency == None:
+      return 'OOS_Loc',None
+    if re.match('N\.Y\.P\.D',agency) != None:
+      return 'OOS_Loc','NYPD' 
+    elif re.match('Woonsocket',agency) != None:
+      return 'OOS','Woonsocket_RI' 
+    else:
+      return 'OOS','various'
+  elif re.match('Combined',gov_lev) != None:
+    return 'combined','various'
+  elif re.match('Federal|State|Local',gov_lev) != None:
+    tmp = re.match('Federal|State|Local',gov_lev).group()
+    return tmp,agency
+  else: 
+    return None,None
+  
 
 # "Gang Affilations and Verifications" is the most reliable section of the report supplies pts.
 # cats is the person summary at the end of most most records in the pdfs and it is the more reliable
@@ -232,11 +270,122 @@ args = parser.parse_args()
 
 logr.basicConfig(filename=args.logf, filemode='w', format='%(name)s - %(levelname)s - %(message)s')
 
+#record columns = tm_stmp,rq_meth,first,sur_nm,agency,gov,rq_ct,match_ct,yr,mo,dt,cop,office,gov,rq_ct,match_ct,photo_ary,other
 with open(args.inf,'r') as inf:
   db = json.load(inf)
 
 pdf = PDF()
 pdf.doc_title('RMV Face Recognition Statistics','Aaron Boxer','1.0')
+
+#{{{ log statistics
+############################### collect log statistics #####################
+intro_text = '''
+The database used to generate this report was created from RMV Enforcement Charts from 2016 through August of 2019 and a redacted record of emails pertaining to Face Recognition activity by the MSP.
+'''
+pdf.add_text(intro_text)
+
+tm_stamp,rq_meth,first_nm,sur_nm,agency,gov_lev,rq_ct,match_ct = [x for x in range(8)]
+agency_hits = {}
+rqs_db = []
+for rec in db:
+  tmp = rec[agency]
+  tmp1,tmp2 = rqAgency(rec[gov_lev],rec[agency])
+  rqs_db.append([rec[tm_stamp],rqMeth(rec[rq_meth]),tmp1,tmp2,rec[first_nm],rec[sur_nm]])
+  if tmp in agency_hits:
+    agency_hits[tmp] += 1
+  else:
+    agency_hits[tmp] = 1
+
+agencies = [(key, value) for key, value in agency_hits.items()]
+agencies.sort(key=lambda x: x[-1],reverse=True)
+
+rqs_sz = len(rqs_db)
+email_rqs = [x for x in rqs_db if x[1] == 'email']
+email_sz = len(email_rqs)
+walkin_rqs = [x for x in rqs_db if x[1] == 'walkin']
+walkin_sz = len(walkin_rqs)
+fax_rqs = [x for x in rqs_db if x[1] == 'fax']
+fax_sz = len(fax_rqs)
+phone_rqs = [x for x in rqs_db if x[1] == 'phone']
+phone_sz = len(phone_rqs)
+none_rqs = [x for x in rqs_db if x[1] == None]
+none_sz = len(none_rqs)
+
+if rqs_sz != email_sz + walkin_sz + fax_sz + phone_sz + none_sz:
+  print(rqs_sz,email_sz,walkin_sz,fax_sz,phone_sz,none_sz)
+
+fed_rqs = [x for x in rqs_db if x[2] == 'Federal']
+fed_sz = len(fed_rqs)
+state_rqs = [x for x in rqs_db if x[2] == 'State']
+state_sz= len(state_rqs)
+local_rqs = [x for x in rqs_db if x[2] == 'Local']
+local_sz= len(local_rqs)
+comb_rqs = [x for x in rqs_db if x[2] == 'combined']
+comb_sz= len(comb_rqs)
+unk_rqs = [x for x in rqs_db if x[2] == None]
+unk_sz= len(unk_rqs)
+oos_rqs = [x for x in rqs_db if x[2] != None and re.match('OOS',x[2]) != None]
+oos_sz= len(oos_rqs)
+
+if rqs_sz != fed_sz + state_sz + local_sz + comb_sz + unk_sz + oos_sz:
+  print(rqs_sz,fed_sz,state_sz,local_sz,comb_sz,unk_sz,oos_sz)
+
+in_state_hits = {}
+for rq in state_rqs:
+  if rq[3] in in_state_hits:
+    in_state_hits[rq[3]][1] += 1 
+  else:
+    in_state_hits[rq[3]] = ['state',1] 
+
+for rq in local_rqs:
+  if rq[3] in in_state_hits:
+    in_state_hits[rq[3]][1] += 1 
+  else:
+    in_state_hits[rq[3]] = ['local',1] 
+
+in_state_agencies = [(key, value) for key, value in in_state_hits.items()]
+in_state_agencies.sort(key=lambda x: x[-1][-1],reverse=True)
+
+
+pdf.section_title('Who Made Face Recognition Requests and How')
+gov_text = '''
+The RMV receives face recognition requests from lots of different agencies at several different govermental levels. The table below shows a breakdown of those levels. Over 70% were from in-state agencies and about 20% were from the federal government.
+'''
+pdf.add_text(gov_text)
+
+tbl = [['Gov. Level','fraction','count'],
+      ['state',state_sz/rqs_sz,state_sz],
+      ['local',local_sz/rqs_sz,local_sz],
+      ['federal',fed_sz/rqs_sz,fed_sz],
+      ['out of state',oos_sz/rqs_sz,oos_sz],
+      ['several',comb_sz/rqs_sz,comb_sz],
+      ['none',unk_sz/rqs_sz,unk_sz],
+      ['total',rqs_sz/rqs_sz,rqs_sz]]
+pdf.basic_table('Goverment Levels',tbl)
+pdf.add_note('Only a couple of log entries did not list the government level and were counted as "none"')
+
+in_state_text =='''
+Since in-state requests are over 70$ of the total it is interesting to know which agencies made most of them. The table below shows this breakdown.
+'''
+
+
+meth_text = '''
+There are several ways face recognition requests are made to the RMV as the table below shows. Most of them are email requests so if the log is accurate then we should be able to find those emails in the 8 MSP Email pdfs we were given. The table below shows all ways requests were made.
+'''
+pdf.add_text(meth_text)
+
+tbl = [['Method','fraction','count'],
+      ['email',email_sz/rqs_sz,email_sz],
+      ['walkin',walkin_sz/rqs_sz,walkin_sz],
+      ['fax',fax_sz/rqs_sz,fax_sz],
+      ['phone',phone_sz/rqs_sz,phone_sz],
+      ['none',none_sz/rqs_sz,none_sz],
+      ['total',rqs_sz/rqs_sz,rqs_sz]]
+pdf.basic_table('Request Methods',tbl)
+pdf.add_note('A significant number of log entries did not list the method and were counted as "none"')
+
+
+#}}}
 
 pdf.output(args.outf)
 exit()

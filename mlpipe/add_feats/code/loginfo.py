@@ -46,10 +46,11 @@ parser.add_argument('outf', help='cops json file')
 parser.add_argument('dbgf', help='csv debug file')
 args = parser.parse_args()
   
+#yr,mon,day,officer,agency,office,gov_lev,rq_meth,rq_ct,rq_match,phota_ary,other,notes
 with open(args.inf0,'r') as inf:
   rqs_db = json.load(inf)
 
-#yr,mo,dt,cop,agency,office,gov,rq_type,rq_ct,match_ct,photo_ary,other = [x for x in range(12)]
+#rq_nm,mo,dt,cop,agency,office,gov,rq_type,rq_ct,match_ct,photo_ary,other = [x for x in range(12)]
 #The people listed in the request log are not employees of MASS DOT-RMV/Enforcement Services 
 #that runs FR software
 rq_cops = []
@@ -62,15 +63,14 @@ for rq in rqs_db:
   #    break
   #else:
   #  rq_cops.append([rq[3],first_nm,sur_nm] + rq[4:7])
-    rq_cops.append([ts,rq[7],first_nm,sur_nm,rq[4],rq[6],rq[0],rq[1],rq[2],rq[3],rq[5],rq[8],rq[9],rq[10],rq[11]])
+    rq_cops.append([ts,rq[7],first_nm,sur_nm,rq[4],rq[6],rq[8],rq[9],rq[0],rq[1],rq[2],rq[3],rq[5],rq[10],rq[11]])
   else:
     no_date_ct += 1
 
 rq_cops.sort(key=lambda row: row[0])
 print('no_date_ct ',no_date_ct)
      
-#col_nms = 'cop,1st_nm,2nd_nm,agency,office,gov'
-col_nms = 'tm_stmp,rq_type,first,sur_nm,agency,gov,yr,mo,dt,cop,office,gov,rq_ct,match_ct,photo_ary,other'
+col_nms = 'tm_stmp,rq_meth,first,sur_nm,agency,gov,rq_ct,match_ct,yr,mo,dt,cop,office,photo_ary,other'
         
 with open(args.dbgf, 'w', newline='') as csvfile:
   csvwriter = csv.writer(csvfile, delimiter=',')

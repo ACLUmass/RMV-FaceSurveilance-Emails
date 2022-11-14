@@ -1,0 +1,51 @@
+Federal
+=======
+ ('D.E.A', 42),
+ ('H.S.I', 33),
+ ('I.C.E', 8),
+ ('D.O.J', 7),
+ ('E.R.O', 6),
+ ('F.B.I', 2),
+ ('A.T.F', 2),
+ ('US Marshals', 2),
+
+State
+=====
+[('M.S.P', 171),
+ ('MassDOT', 30),
+ ('Enforcement Services', 20),
+ ('Enforcement', 7),
+ ('Prison Reentry Program', 3),
+ ('R.M.V', 2),
+ ('Comm. Of Probation', 2),
+
+
+Local
+=====
+ ('Boston PD', 106),
+ ('Cambridge PD', 17),
+ ('Weymouth PD', 9),
+ ('Brockton PD', 4),
+ ('Waltham PD', 3),
+ ('Revere PD', 3),
+ ('Tewksbury PD', 2),
+ ('Maynard PD', 2),
+ ('Chelsea PD', 2),
+ ('Newton Police', 2),
+ ('Quincy PD', 2),
+ ('North Adams PD', 2),
+
+OOS - Local
+===========
+ ('N.Y.P.D', 19),
+ ('Woonsocket RI PD', 10),
+
+OOS - State
+===========
+ ('New Hampshire State Police', 2),
+ ('Rhode Island PD', 2),
+
+
+
+
+
