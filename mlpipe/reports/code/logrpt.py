@@ -129,7 +129,20 @@ def rqAgency(gov_lev,agency):
     return 'combined','various'
   elif re.match('Federal|State|Local',gov_lev) != None:
     tmp = re.match('Federal|State|Local',gov_lev).group()
-    return tmp,agency
+    if re.match('Enforcement',agency) != None:
+      return(tmp,'Enforcement')
+    elif re.match('R\.M\.V',agency) != None:
+      return(tmp,'RMV')
+    elif re.match('M\.S\.P',agency) != None:
+      return(tmp,'MSP')
+    elif re.match('D\.H\.S',agency) != None:
+      return(tmp,'DHS')
+    elif re.match('H\.S\.I',agency) != None:
+      return(tmp,'HSI')
+    elif re.match('I\.C\.E',agency) != None:
+      return(tmp,'ICE')
+    else:
+      return tmp,agency
   else: 
     return None,None
   
@@ -277,8 +290,6 @@ with open(args.inf,'r') as inf:
 pdf = PDF()
 pdf.doc_title('RMV Face Recognition Statistics','Aaron Boxer','1.0')
 
-#{{{ log statistics
-############################### collect log statistics #####################
 intro_text = '''
 The database used to generate this report was created from RMV Enforcement Charts from 2016 through August of 2019 and a redacted record of emails pertaining to Face Recognition activity by the MSP.
 '''
@@ -296,23 +307,13 @@ for rec in db:
   else:
     agency_hits[tmp] = 1
 
+rqs_sz = len(rqs_db)
 agencies = [(key, value) for key, value in agency_hits.items()]
 agencies.sort(key=lambda x: x[-1],reverse=True)
 
-rqs_sz = len(rqs_db)
-email_rqs = [x for x in rqs_db if x[1] == 'email']
-email_sz = len(email_rqs)
-walkin_rqs = [x for x in rqs_db if x[1] == 'walkin']
-walkin_sz = len(walkin_rqs)
-fax_rqs = [x for x in rqs_db if x[1] == 'fax']
-fax_sz = len(fax_rqs)
-phone_rqs = [x for x in rqs_db if x[1] == 'phone']
-phone_sz = len(phone_rqs)
-none_rqs = [x for x in rqs_db if x[1] == None]
-none_sz = len(none_rqs)
-
-if rqs_sz != email_sz + walkin_sz + fax_sz + phone_sz + none_sz:
-  print(rqs_sz,email_sz,walkin_sz,fax_sz,phone_sz,none_sz)
+#{{{ log statistics
+############################### collect log statistics #####################
+pdf.section_title('Who Made Face Recognition Requests and How')
 
 fed_rqs = [x for x in rqs_db if x[2] == 'Federal']
 fed_sz = len(fed_rqs)
@@ -330,24 +331,6 @@ oos_sz= len(oos_rqs)
 if rqs_sz != fed_sz + state_sz + local_sz + comb_sz + unk_sz + oos_sz:
   print(rqs_sz,fed_sz,state_sz,local_sz,comb_sz,unk_sz,oos_sz)
 
-in_state_hits = {}
-for rq in state_rqs:
-  if rq[3] in in_state_hits:
-    in_state_hits[rq[3]][1] += 1 
-  else:
-    in_state_hits[rq[3]] = ['state',1] 
-
-for rq in local_rqs:
-  if rq[3] in in_state_hits:
-    in_state_hits[rq[3]][1] += 1 
-  else:
-    in_state_hits[rq[3]] = ['local',1] 
-
-in_state_agencies = [(key, value) for key, value in in_state_hits.items()]
-in_state_agencies.sort(key=lambda x: x[-1][-1],reverse=True)
-
-
-pdf.section_title('Who Made Face Recognition Requests and How')
 gov_text = '''
 The RMV receives face recognition requests from lots of different agencies at several different govermental levels. The table below shows a breakdown of those levels. Over 70% were from in-state agencies and about 20% were from the federal government.
 '''
@@ -364,9 +347,23 @@ tbl = [['Gov. Level','fraction','count'],
 pdf.basic_table('Goverment Levels',tbl)
 pdf.add_note('Only a couple of log entries did not list the government level and were counted as "none"')
 
-in_state_text =='''
+in_state_text = '''
 Since in-state requests are over 70$ of the total it is interesting to know which agencies made most of them. The table below shows this breakdown.
 '''
+
+email_rqs = [x for x in rqs_db if x[1] == 'email']
+email_sz = len(email_rqs)
+walkin_rqs = [x for x in rqs_db if x[1] == 'walkin']
+walkin_sz = len(walkin_rqs)
+fax_rqs = [x for x in rqs_db if x[1] == 'fax']
+fax_sz = len(fax_rqs)
+phone_rqs = [x for x in rqs_db if x[1] == 'phone']
+phone_sz = len(phone_rqs)
+none_rqs = [x for x in rqs_db if x[1] == None]
+none_sz = len(none_rqs)
+
+if rqs_sz != email_sz + walkin_sz + fax_sz + phone_sz + none_sz:
+  print(rqs_sz,email_sz,walkin_sz,fax_sz,phone_sz,none_sz)
 
 
 meth_text = '''
@@ -384,8 +381,68 @@ tbl = [['Method','fraction','count'],
 pdf.basic_table('Request Methods',tbl)
 pdf.add_note('A significant number of log entries did not list the method and were counted as "none"')
 
+instate_text = '''
+Massachusetts state and local agencies made over 70% of all the face recognition requests and 85% of those came from eight agencies. Almost 20% of the requests are from the federal government.
 
+'''
+pdf.add_text(instate_text)
+
+instate_hits = {}
+for rq in state_rqs:
+  if rq[3] in instate_hits:
+    instate_hits[rq[3]][1] += 1 
+  else:
+    instate_hits[rq[3]] = ['state',1] 
+
+for rq in local_rqs:
+  if rq[3] in instate_hits:
+    instate_hits[rq[3]][1] += 1 
+  else:
+    instate_hits[rq[3]] = ['local',1] 
+
+instate_sz = state_sz + local_sz
+
+instate_agencies = [(key, value) for key, value in instate_hits.items()]
+instate_agencies.sort(key=lambda x: x[-1][-1],reverse=True)
+instate_agencies = [x for x in instate_agencies if x[-1][-1] > 3]
+freq_agencies_sz = 0
+for agency in instate_agencies:
+  freq_agencies_sz += agency[-1][-1]
+
+tbl = [['agency','gov level','fraction','requests']]
+for agency in instate_agencies:
+  tbl.append([agency[0],agency[1][0],agency[1][1]/instate_sz,agency[1][1]])
+
+other_sz = instate_sz - freq_agencies_sz
+tbl.append(['other','both',other_sz/instate_sz,other_sz])
+pdf.basic_table('In-State Requesting Agencies',tbl)
+pdf.add_note('Any agency with 3 or less requests is included in "other"')
+
+fed_hits = {}
+for rq in fed_rqs:
+  if rq[3] in fed_hits:
+    fed_hits[rq[3]] += 1 
+  else:
+    fed_hits[rq[3]] = 1 
+
+fed_agencies = [(key, value) for key, value in fed_hits.items()]
+fed_agencies.sort(key=lambda x: x[-1],reverse=True)
+fed_agencies = [x for x in fed_agencies if x[-1] > 1]
+
+freq_agencies_sz = 0
+for agency in fed_agencies:
+  freq_agencies_sz += agency[-1]
+
+tbl = [['agency','fraction','requests']]
+for agency in fed_agencies:
+  tbl.append([agency[0],agency[1]/fed_sz,agency[1]])
+
+other_sz = fed_sz - freq_agencies_sz
+tbl.append(['other',other_sz/fed_sz,other_sz])
+pdf.basic_table('Federal Requesting Agencies',tbl)
+pdf.add_note('Any agency with only 1 request is included in "other"')
 #}}}
+
 
 pdf.output(args.outf)
 exit()
