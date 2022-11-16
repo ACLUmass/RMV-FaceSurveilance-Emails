@@ -46,10 +46,11 @@ class PDF(FPDF):
 
   def add_note(self, text):
     self.set_font('', 'B', 12)
-    self.cell(0,5,'NOTE: ')
-    self.ln()
+    self.cell(15,5,'NOTE: ')
+    #self.ln()
     self.set_font('', '', 12)
-    self.multi_cell(0, 5, text)
+    #self.multi_cell(0, 5, text)
+    self.cell(0, 5, text)
     self.ln()
 
   def page_break(self):
@@ -252,8 +253,12 @@ def one_bar_plot(x,y,info):
   ax.set_xlabel(info['xlabel'])
   ax.set_ylabel(info['ylabel'])
 
+  x_sz = np.arange(len(x))
+  ax.set_xticks(x_sz, x)
+  plt.setp(ax.get_xticklabels(), rotation=45, ha="right", rotation_mode="anchor")
+
   width = 0.70  # the width of the bars
-  rects1 = ax.bar(x, y, width)
+  rects1 = ax.bar(x_sz, y, width)
 
   fig.tight_layout()
   plt.savefig(info['file_nm'])
@@ -265,9 +270,13 @@ def two_bar_plot(x,y1,y2,info):
   ax.set_xlabel(info['xlabel'])
   ax.set_ylabel(info['ylabel'])
 
+  x_sz = np.arange(len(x))
+  ax.set_xticks(x_sz, x)
+  plt.setp(ax.get_xticklabels(), rotation=45, ha="right", rotation_mode="anchor")
+
   width = 0.45  # the width of the bars
-  rects1 = ax.bar(x - width/2, y1, width, label = info['y1legend'])
-  rects2 = ax.bar(x + width/2, y2, width, label = info['y2legend'])
+  rects1 = ax.bar(x_sz - width/2, y1, width, label = info['y1legend'])
+  rects2 = ax.bar(x_sz + width/2, y2, width, label = info['y2legend'])
   ax.legend()
 
   fig.tight_layout()
@@ -291,9 +300,14 @@ pdf = PDF()
 pdf.doc_title('RMV Face Recognition Statistics','Aaron Boxer','1.0')
 
 intro_text = '''
-The database used to generate this report was created from RMV Enforcement Charts from 2016 through August of 2019 and a redacted record of emails pertaining to Face Recognition activity by the MSP.
-'''
+The database used to generate this report was created from RMV Enforcement Charts from 2016 through August of 2019 and a redacted record of emails pertaining to Face Recognition activity by the MSP.  '''
 pdf.add_text(intro_text)
+
+#{{{ agency statistics
+############################### agency statistics #####################
+pdf.section_title('Who Made Face Recognition Requests')
+agency_text = '''Most of the requests for face recognition came for a small number of federal, in-state and local agencies as shown in the table below''' 
+pdf.add_text(agency_text)
 
 tm_stamp,rq_meth,first_nm,sur_nm,agency,gov_lev,rq_ct,match_ct = [x for x in range(8)]
 agency_hits = {}
@@ -302,54 +316,32 @@ for rec in db:
   tmp = rec[agency]
   tmp1,tmp2 = rqAgency(rec[gov_lev],rec[agency])
   rqs_db.append([rec[tm_stamp],rqMeth(rec[rq_meth]),tmp1,tmp2,rec[first_nm],rec[sur_nm]])
-  if tmp in agency_hits:
-    agency_hits[tmp] += 1
+  if tmp2 in agency_hits:
+    agency_hits[tmp2][1] += 1
   else:
-    agency_hits[tmp] = 1
+    agency_hits[tmp2] = [tmp1,1]
 
 rqs_sz = len(rqs_db)
 agencies = [(key, value) for key, value in agency_hits.items()]
-agencies.sort(key=lambda x: x[-1],reverse=True)
+agencies = [[x[0],x[1][0],x[1][1]] for x in agencies]
+agencies.sort(key=lambda x: x[2],reverse=True)
+agencies = [x for x in agencies if x[2] > 3]
+agencies_sz = sum([x[2] for x in agencies])
 
-#{{{ log statistics
-############################### collect log statistics #####################
-pdf.section_title('Who Made Face Recognition Requests and How')
+tbl = [['agency','gov level','fraction','requests']]
+for agency in agencies:
+  tbl.append([agency[0],agency[1],agency[2]/rqs_sz,agency[2]])
 
-fed_rqs = [x for x in rqs_db if x[2] == 'Federal']
-fed_sz = len(fed_rqs)
-state_rqs = [x for x in rqs_db if x[2] == 'State']
-state_sz= len(state_rqs)
-local_rqs = [x for x in rqs_db if x[2] == 'Local']
-local_sz= len(local_rqs)
-comb_rqs = [x for x in rqs_db if x[2] == 'combined']
-comb_sz= len(comb_rqs)
-unk_rqs = [x for x in rqs_db if x[2] == None]
-unk_sz= len(unk_rqs)
-oos_rqs = [x for x in rqs_db if x[2] != None and re.match('OOS',x[2]) != None]
-oos_sz= len(oos_rqs)
-
-if rqs_sz != fed_sz + state_sz + local_sz + comb_sz + unk_sz + oos_sz:
-  print(rqs_sz,fed_sz,state_sz,local_sz,comb_sz,unk_sz,oos_sz)
-
-gov_text = '''
-The RMV receives face recognition requests from lots of different agencies at several different govermental levels. The table below shows a breakdown of those levels. Over 70% were from in-state agencies and about 20% were from the federal government.
-'''
-pdf.add_text(gov_text)
-
-tbl = [['Gov. Level','fraction','count'],
-      ['state',state_sz/rqs_sz,state_sz],
-      ['local',local_sz/rqs_sz,local_sz],
-      ['federal',fed_sz/rqs_sz,fed_sz],
-      ['out of state',oos_sz/rqs_sz,oos_sz],
-      ['several',comb_sz/rqs_sz,comb_sz],
-      ['none',unk_sz/rqs_sz,unk_sz],
-      ['total',rqs_sz/rqs_sz,rqs_sz]]
-pdf.basic_table('Goverment Levels',tbl)
-pdf.add_note('Only a couple of log entries did not list the government level and were counted as "none"')
-
-in_state_text = '''
-Since in-state requests are over 70$ of the total it is interesting to know which agencies made most of them. The table below shows this breakdown.
-'''
+other_sz = rqs_sz - agencies_sz
+tbl.append(['other','all',other_sz/rqs_sz,other_sz])
+tbl.append(['total','all',rqs_sz/rqs_sz,rqs_sz])
+pdf.basic_table('Requesting Agencies',tbl)
+pdf.add_note('Any agency with 3 or less requests is included in "other"')
+#}}}
+#{{{ method statistics
+############################### method statistics #####################
+pdf.section_title('How were Face Recognition Requests Made')
+meth_text = '''There are several ways face recognition requests are made to the RMV as the table below shows. Most of them are email requests so if the log is accurate then we should be able to find those emails in the 8 MSP Email pdfs we were given. The table below shows all ways requests were made.'''
 
 email_rqs = [x for x in rqs_db if x[1] == 'email']
 email_sz = len(email_rqs)
@@ -365,10 +357,6 @@ none_sz = len(none_rqs)
 if rqs_sz != email_sz + walkin_sz + fax_sz + phone_sz + none_sz:
   print(rqs_sz,email_sz,walkin_sz,fax_sz,phone_sz,none_sz)
 
-
-meth_text = '''
-There are several ways face recognition requests are made to the RMV as the table below shows. Most of them are email requests so if the log is accurate then we should be able to find those emails in the 8 MSP Email pdfs we were given. The table below shows all ways requests were made.
-'''
 pdf.add_text(meth_text)
 
 tbl = [['Method','fraction','count'],
@@ -378,72 +366,69 @@ tbl = [['Method','fraction','count'],
       ['phone',phone_sz/rqs_sz,phone_sz],
       ['none',none_sz/rqs_sz,none_sz],
       ['total',rqs_sz/rqs_sz,rqs_sz]]
+pdf.page_break()
 pdf.basic_table('Request Methods',tbl)
 pdf.add_note('A significant number of log entries did not list the method and were counted as "none"')
-
-instate_text = '''
-Massachusetts state and local agencies made over 70% of all the face recognition requests and 85% of those came from eight agencies. Almost 20% of the requests are from the federal government.
-
-'''
-pdf.add_text(instate_text)
-
-instate_hits = {}
-for rq in state_rqs:
-  if rq[3] in instate_hits:
-    instate_hits[rq[3]][1] += 1 
-  else:
-    instate_hits[rq[3]] = ['state',1] 
-
-for rq in local_rqs:
-  if rq[3] in instate_hits:
-    instate_hits[rq[3]][1] += 1 
-  else:
-    instate_hits[rq[3]] = ['local',1] 
-
-instate_sz = state_sz + local_sz
-
-instate_agencies = [(key, value) for key, value in instate_hits.items()]
-instate_agencies.sort(key=lambda x: x[-1][-1],reverse=True)
-instate_agencies = [x for x in instate_agencies if x[-1][-1] > 3]
-freq_agencies_sz = 0
-for agency in instate_agencies:
-  freq_agencies_sz += agency[-1][-1]
-
-tbl = [['agency','gov level','fraction','requests']]
-for agency in instate_agencies:
-  tbl.append([agency[0],agency[1][0],agency[1][1]/instate_sz,agency[1][1]])
-
-other_sz = instate_sz - freq_agencies_sz
-tbl.append(['other','both',other_sz/instate_sz,other_sz])
-pdf.basic_table('In-State Requesting Agencies',tbl)
-pdf.add_note('Any agency with 3 or less requests is included in "other"')
-
-fed_hits = {}
-for rq in fed_rqs:
-  if rq[3] in fed_hits:
-    fed_hits[rq[3]] += 1 
-  else:
-    fed_hits[rq[3]] = 1 
-
-fed_agencies = [(key, value) for key, value in fed_hits.items()]
-fed_agencies.sort(key=lambda x: x[-1],reverse=True)
-fed_agencies = [x for x in fed_agencies if x[-1] > 1]
-
-freq_agencies_sz = 0
-for agency in fed_agencies:
-  freq_agencies_sz += agency[-1]
-
-tbl = [['agency','fraction','requests']]
-for agency in fed_agencies:
-  tbl.append([agency[0],agency[1]/fed_sz,agency[1]])
-
-other_sz = fed_sz - freq_agencies_sz
-tbl.append(['other',other_sz/fed_sz,other_sz])
-pdf.basic_table('Federal Requesting Agencies',tbl)
-pdf.add_note('Any agency with only 1 request is included in "other"')
 #}}}
+#{{{ date statistics
+############################### date statistics #####################
+pdf.section_title('When were Face Recognition Requests Made')
+time_text = '''The face recognition log covers 2016 through Q3 of 2019. It looks like in-state face recognition requests roughly doubled during 2016 and remained higher throughout 2017 and 2018. The decline in requests for 2019 Q2 and Q3  may be an anomaly because the entries for June or July said "No Logs" and it is not clear if they were lost or no requests came in. 
+'''
+pdf.add_text(time_text)
+
+qtrs = [['Q1',1],['Q2',4],['Q3',7],['Q4',10]]
+tm_stamps = []
+for yr in range(2016,2020):
+  for qtr,mon in qtrs:
+    tmp = qtr + '-' + str(yr)
+    ts = datetime.datetime(yr,mon,1).timestamp()
+    tm_stamps.append([tmp,ts])
+
+x_qtrs = []
+y_qtrs = []
+for i in range(len(tm_stamps)-1):
+  x_qtrs.append(tm_stamps[i][0])
+  beg = tm_stamps[i][1]
+  end = tm_stamps[i+1][1]
+  tmp = len([x[0] for x in rqs_db if x[0] >= beg and x[0] < end])
+  y_qtrs.append(tmp)
+
+rqs_hist_png = 'rqs_hist.png'
+rqs_plt = {'title':'Distribution Face Recognition Requests',
+            'xlabel':'Quarter',
+            'ylabel':'Number of Requests',
+            'file_nm':rqs_hist_png}
+one_bar_plot(x_qtrs,y_qtrs,rqs_plt)
+#pdf.add_image(rqs_hist_png)
+
+x_qtrs = []
+y_qtrs = [[],[]]
+for i in range(len(tm_stamps)-1):
+  x_qtrs.append(tm_stamps[i][0])
+  beg = tm_stamps[i][1]
+  end = tm_stamps[i+1][1]
+  #tmp = len([x[0] for x in rqs_db if x[0] >= beg and x[0] < end and x[2] == 'Federal'])
+  tmp = len([x[0] for x in rqs_db if x[0] >= beg and x[0] < end and (x[2] == 'State' or x[2] == 'Local')])
+  y_qtrs[0].append(tmp)
+  tmp = len([x[0] for x in rqs_db if x[0] >= beg and x[0] < end and not (x[2] == 'State' or x[2] == 'Local')])
+  #tmp = len([x[0] for x in rqs_db if x[0] >= beg and x[0] < end and x[2] != 'Federal'])
+  y_qtrs[1].append(tmp)
 
 
+
+rqs2_hist_png = 'rqs2_hist.png'
+rqs2_plt = {'title':'Distribution Face Recognition Requests',
+            'xlabel':'Quarter',
+            'ylabel':'Number of Requests',
+            'y1legend':'In State',
+            'y2legend':'Other',
+            'file_nm':rqs2_hist_png}
+two_bar_plot(x_qtrs,y_qtrs[0],y_qtrs[1],rqs2_plt)
+pdf.add_image(rqs2_hist_png)
+pdf.add_note('"Other" includes federal and out-of-state requests')
+
+#}}}
 pdf.output(args.outf)
 exit()
 
